@@ -82,22 +82,28 @@ namespace tvp_projekat1
                 TextBox idSmeraTb = mainPanel.Controls.Find("idSmeraTb", false)[0] as TextBox;
                 TextBox nazivSmeraTb = mainPanel.Controls.Find("nazivSmeraTb", false)[0] as TextBox;
 
-                Smerovi smer = new Smerovi();
-                smer.NazivSmera = nazivSmeraTb.Text;
+                Smerovi noviSmer = new Smerovi();
+                noviSmer.NazivSmera = nazivSmeraTb.Text;
 
                 if (Int32.TryParse(idSmeraTb.Text, out noviIdSmera))
                 {
-                    smer.SifraSmera = noviIdSmera;
-                    kolekcijaSmerova.InsertOne(smer);
+                    noviSmer.SifraSmera = noviIdSmera;
 
-                    MessageBox.Show("Smer " + smer.NazivSmera + " uspesno dodat!");
-                    idSmeraTb.Enabled = false;
-                    nazivSmeraTb.Enabled = false;
+                    if (!DuplikatSmera(noviIdSmera))
+                    {
+                        kolekcijaSmerova.InsertOne(noviSmer);
 
-                    buttonSaveIzmene.Enabled = false;
-                    buttonAddSmer.Enabled = true;
+                        MessageBox.Show("Smer " + noviSmer.NazivSmera + " uspesno dodat!");
+                        idSmeraTb.Enabled = false;
+                        nazivSmeraTb.Enabled = false;
 
-                    GenerisiSmerove();
+                        buttonSaveIzmene.Enabled = false;
+                        buttonAddSmer.Enabled = true;
+
+                        GenerisiSmerove();
+                    }
+                    else
+                        MessageBox.Show("Smer vec postoji u bazi!");
                 }
                 else
                 {
@@ -130,89 +136,7 @@ namespace tvp_projekat1
         private void VerifikujIDodajPredmet(object sender, EventArgs e)
         {
             if(flagZaSaveDugme.Equals("predmet"))
-            {
-                TextBox sifraPredmetaTb = mainPanel.Controls.Find("sifraPredmetaTb", false)[0] as TextBox;
-                TextBox nazivPredmetaTb = mainPanel.Controls.Find("nazivPredmetaTb", false)[0] as TextBox;
-                TextBox profesorTb = mainPanel.Controls.Find("profesorTb", false)[0] as TextBox;
-                TextBox obavezanTb = mainPanel.Controls.Find("obavezanTb", false)[0] as TextBox;
-                TextBox espbTb = mainPanel.Controls.Find("espbTb", false)[0] as TextBox;
-                TextBox smeroviTb = mainPanel.Controls.Find("smeroviTb", false)[0] as TextBox;
-                TextBox semestarTb = mainPanel.Controls.Find("semestarTb", false)[0] as TextBox;
-
-                int sifraPredmeta = 0;
-                int semestar = 0;
-                int espb = 0;
-
-                bool errorFlag = false;
-
-                Predmeti predmet = new Predmeti();
-
-                if(sifraPredmetaTb.Text.Length == 0 || nazivPredmetaTb.Text.Length == 0 ||
-                    obavezanTb.Text.Length == 0 ||
-                    espbTb.Text.Length == 0 || semestarTb.Text.Length == 0)
-                {
-                    MessageBox.Show("Sva polja osim Profesor i Smerovi su obavezna! Pokusajte ponovo.");
-                }
-                else
-                {
-                    if (Int32.TryParse(sifraPredmetaTb.Text, out sifraPredmeta) && Int32.TryParse(espbTb.Text, out espb)
-                    && Int32.TryParse(semestarTb.Text, out semestar))
-                    {
-                        string[] listaSmerovaString;
-                        List<Smerovi> listaSmerova = new List<Smerovi>();
-
-                        predmet.ESPB = espb;
-                        predmet.SifraPredmeta = sifraPredmeta.ToString();
-                        predmet.NazivPredmeta = nazivPredmetaTb.Text;
-                        predmet.Obavezan = (obavezanTb.Text.Equals("Obavezan")) ? true : false;
-                        predmet.Semestar = semestar;
-
-                        if (profesorTb.Text.Length == 0) predmet.Profesor = "";
-                        if (smeroviTb.Text.Length == 0) predmet.SmeroviPredmeta = new List<Smerovi>();
-                        else
-                        {
-                            listaSmerovaString = smeroviTb.Text.Split(',');
-
-                            foreach (string smer in listaSmerovaString)
-                            {
-                                List<Smerovi> pronadjeniSmer = kolekcijaSmerova
-                                    .Find(Builders<Smerovi>.Filter.Eq("nazivSmera", smer.Trim())).ToList();
-                                if (pronadjeniSmer.Count > 0)
-                                    listaSmerova.Add(pronadjeniSmer[0]);
-                                else
-                                {
-                                    MessageBox.Show("Uneti smerovi su neispravni ili nepostojeci!");
-                                    listaSmerova = null;
-                                    errorFlag = true;
-                                    break;
-                                }
-                                    
-                            }
-
-                            predmet.SmeroviPredmeta = listaSmerova;
-                        }
-                            
-                        if(!errorFlag)
-                        {
-                            kolekcijaPredmeta.InsertOne(predmet);
-
-                            MessageBox.Show("Predmet " + predmet.NazivPredmeta + " uspesno dodat!");
-                            sifraPredmetaTb.Enabled = nazivPredmetaTb.Enabled = profesorTb.Enabled =
-                                obavezanTb.Enabled = espbTb.Enabled = smeroviTb.Enabled = semestarTb.Enabled = false;
-
-                            buttonSaveIzmene.Enabled = false;
-                            buttonAddPredmet.Enabled = true;
-
-                            GenerisiPredmete();
-                        }             
-                    }
-                    else
-                    {
-                        MessageBox.Show("Greska u unosu - sifra predmeta, ESPB, i semestar moraju biti brojevi!");
-                    }
-                }          
-                
-            }       
+                ObradaPredmeta(null);                
         }
 
         private void buttonAddStudent_Click(object sender, EventArgs e)
@@ -247,7 +171,7 @@ namespace tvp_projekat1
                 TextBox brojTelefonaTb = mainPanel.Controls.Find("brojTelefonaTb", false)[0] as TextBox;
                 TextBox jmbgTb = mainPanel.Controls.Find("jmbgTb", false)[0] as TextBox;
 
-                Studenti student = new Studenti();
+                Studenti noviStudent = new Studenti();
 
                 if(imePrezimeTb.Text.Length > 0 && datumRodjenjaTb.Text.Length > 0 &&
                     brojTelefonaTb.Text.Length > 0 && jmbgTb.Text.Length > 0)
@@ -256,62 +180,31 @@ namespace tvp_projekat1
 
                     if (smerTb.Text.Length == 0)
                     {
-                        student.Smer = new Smerovi();
-                        student.ImePrezime = imePrezimeTb.Text;
-                        student.BrojIndeksa = (brojIndeksaTb.Text.Length > 0) ? brojIndeksaTb.Text : "temp";
-                        student.DatumRodjenja = datumRodjenjaTb.Text;
-                        student.JMBG = jmbgTb.Text;
-                        student.BrojTelefona = brojTelefonaTb.Text;
+                        noviStudent.Smer = new Smerovi();
+                        noviStudent.ImePrezime = imePrezimeTb.Text;
+                        noviStudent.BrojIndeksa = (brojIndeksaTb.Text.Length > 0) ? brojIndeksaTb.Text : ("temp"+jmbgTb.Text);
+                        noviStudent.DatumRodjenja = datumRodjenjaTb.Text;
+                        noviStudent.JMBG = jmbgTb.Text;
+                        noviStudent.BrojTelefona = brojTelefonaTb.Text;
 
-                        IzbornaLista izbornaLista = new IzbornaLista();
-                        izbornaLista.Predmeti = new List<Predmeti>();
-                        izbornaLista.PredmetiDrugihSmerova = new List<Predmeti>();
-                        izbornaLista.BrojIndeksa = ((student.BrojIndeksa.Length > 0) ? student.BrojIndeksa : "temp");
+                        IzbornaLista novaIzbornaLista = new IzbornaLista();
+                        novaIzbornaLista.Predmeti = new List<Predmeti>();
+                        novaIzbornaLista.PredmetiDrugihSmerova = new List<Predmeti>();
+                        novaIzbornaLista.BrojIndeksa = (noviStudent.BrojIndeksa.Length > 0) ? noviStudent.BrojIndeksa : ("temp" + jmbgTb.Text);
 
                         Login login = new Login();
                         login.AccountStatus = "student";
-                        login.Username = (student.BrojIndeksa.Length > 0) ? student.BrojIndeksa : student.ImePrezime.Split(' ')[0];
-                        login.Password = student.ImePrezime.Split(' ')[0];
+                        login.Username = (noviStudent.BrojIndeksa.Length > 0) ? noviStudent.BrojIndeksa : noviStudent.ImePrezime.Split(' ')[0];
+                        login.Password = noviStudent.ImePrezime.Split(' ')[0];
 
-                        kolekcijaStudenata.InsertOne(student);
-                        kolekcijaIzbornihListi.InsertOne(izbornaLista);
-                        kolekcijaLogin.InsertOne(login);
-
-                        MessageBox.Show("Student " + student.ImePrezime + " uspesno dodat!");
-                        MessageBox.Show("Izborna lista uspesno kreirana!");
-                        MessageBox.Show("Nalog za pristup studentskom servisu kreiran!");
-
-                        buttonSaveIzmene.Enabled = false;
-                        buttonAddStudent.Enabled = true;
-
-                        GenerisiStudente();
-                    }     
-                    else
-                    {
-                        if (pronadjeniSmer.Count > 0)
+                        if (!DuplikatStudenta(noviStudent.JMBG, noviStudent.BrojTelefona))
                         {
-                            student.Smer = pronadjeniSmer[0];
-                            student.ImePrezime = imePrezimeTb.Text;
-                            student.BrojIndeksa = (brojIndeksaTb.Text.Length > 0) ? brojIndeksaTb.Text : "";
-                            student.DatumRodjenja = datumRodjenjaTb.Text;
-                            student.JMBG = jmbgTb.Text;
-                            student.BrojTelefona = brojTelefonaTb.Text;
 
-                            IzbornaLista izbornaLista = new IzbornaLista();
-                            izbornaLista.Predmeti = new List<Predmeti>();
-                            izbornaLista.PredmetiDrugihSmerova = new List<Predmeti>();
-                            izbornaLista.BrojIndeksa = ((student.BrojIndeksa.Length > 0) ? student.BrojIndeksa : "");
-
-                            Login login = new Login();
-                            login.AccountStatus = "student";
-                            login.Username = (student.BrojIndeksa.Length > 0) ? student.BrojIndeksa : student.ImePrezime.Split(' ')[0];
-                            login.Password = student.ImePrezime.Split(' ')[0];
-
-                            kolekcijaStudenata.InsertOne(student);
-                            kolekcijaIzbornihListi.InsertOne(izbornaLista);
+                            kolekcijaStudenata.InsertOne(noviStudent);
+                            kolekcijaIzbornihListi.InsertOne(novaIzbornaLista);
                             kolekcijaLogin.InsertOne(login);
 
-                            MessageBox.Show("Student " + student.ImePrezime + " uspesno dodat!");
+                            MessageBox.Show("Student " + noviStudent.ImePrezime + " uspesno dodat!");
                             MessageBox.Show("Izborna lista uspesno kreirana!");
                             MessageBox.Show("Nalog za pristup studentskom servisu kreiran!");
 
@@ -321,15 +214,58 @@ namespace tvp_projekat1
                             GenerisiStudente();
                         }
                         else
+                            MessageBox.Show("Student vec postoji u bazi!");
+                    }     
+                    else
+                    {
+                        if (pronadjeniSmer.Count > 0)
                         {
-                            student.Smer = new Smerovi();
+                            noviStudent.Smer = pronadjeniSmer[0];
+                            noviStudent.ImePrezime = imePrezimeTb.Text;
+                            noviStudent.BrojIndeksa = (brojIndeksaTb.Text.Length > 0) ? brojIndeksaTb.Text : "";
+                            noviStudent.DatumRodjenja = datumRodjenjaTb.Text;
+                            noviStudent.JMBG = jmbgTb.Text;
+                            noviStudent.BrojTelefona = brojTelefonaTb.Text;
+
+                            IzbornaLista izbornaLista = new IzbornaLista();
+                            izbornaLista.Predmeti = new List<Predmeti>();
+                            izbornaLista.PredmetiDrugihSmerova = new List<Predmeti>();
+                            izbornaLista.BrojIndeksa = ((noviStudent.BrojIndeksa.Length > 0) ? noviStudent.BrojIndeksa : "");
+
+                            Login login = new Login();
+                            login.AccountStatus = "student";
+                            login.Username = (noviStudent.BrojIndeksa.Length > 0) ? noviStudent.BrojIndeksa : noviStudent.ImePrezime.Split(' ')[0];
+                            login.Password = noviStudent.ImePrezime.Split(' ')[0];
+
+                            if (!DuplikatStudenta(noviStudent.JMBG, noviStudent.BrojTelefona))
+                            {
+
+                                kolekcijaStudenata.InsertOne(noviStudent);
+                                kolekcijaIzbornihListi.InsertOne(izbornaLista);
+                                kolekcijaLogin.InsertOne(login);
+
+                                MessageBox.Show("Student " + noviStudent.ImePrezime + " uspesno dodat!");
+                                MessageBox.Show("Izborna lista uspesno kreirana!");
+                                MessageBox.Show("Nalog za pristup studentskom servisu kreiran!");
+
+                                buttonSaveIzmene.Enabled = false;
+                                buttonAddStudent.Enabled = true;
+
+                                GenerisiStudente();
+                            }
+                            else
+                                MessageBox.Show("Student vec postoji u bazi!");
+                        }
+                        else
+                        {
+                            noviStudent.Smer = new Smerovi();
                             MessageBox.Show("Uneti smer ne postoji!");
                         }
                     }             
                 }
                 else
                 {
-                    MessageBox.Show("Greska u unosu! Polja za ime i prezime, datum rodjenja, broj telefona i JMBG su obavezna!");
+                    MessageBox.Show("Greska u unosu! Polja za ime i prezime, datum rodjenja, broj telefona, i JMBG su obavezna!");
                 }
             }         
         }
@@ -450,7 +386,7 @@ namespace tvp_projekat1
                 Login noviLogin = new Login();
 
                 IzbornaLista postojecaIzbornaLista = kolekcijaIzbornihListi.Find(Builders<IzbornaLista>.Filter.Eq("brojIndeksa", prethodnoSelektovanStudent.BrojIndeksa)).First();
-                Login postojeciLogin = kolekcijaLogin.Find(Builders<Login>.Filter.Eq("username", prethodnoSelektovanStudent)).First();
+                Login postojeciLogin = kolekcijaLogin.Find(Builders<Login>.Filter.Eq("username", prethodnoSelektovanStudent.BrojIndeksa)).First();
 
                 noviStudent.ID = prethodnoSelektovanStudent.ID;
 
@@ -459,6 +395,7 @@ namespace tvp_projekat1
                 novaIzbornaLista.PredmetiDrugihSmerova = postojecaIzbornaLista.PredmetiDrugihSmerova;
                 
                 noviLogin.ID = postojeciLogin.ID;
+                noviLogin.AccountStatus = "student";
 
                 if (imePrezimeTb.Text.Length > 0 && datumRodjenjaTb.Text.Length > 0 &&
                     brojTelefonaTb.Text.Length > 0 && jmbgTb.Text.Length > 0)
@@ -469,23 +406,36 @@ namespace tvp_projekat1
                     {
                         noviStudent.Smer = new Smerovi();
                         noviStudent.ImePrezime = imePrezimeTb.Text;
-                        noviStudent.BrojIndeksa = (brojIndeksaTb.Text.Length > 0) ? brojIndeksaTb.Text : "temp";
+                        noviStudent.BrojIndeksa = (brojIndeksaTb.Text.Length > 0) ? brojIndeksaTb.Text : ("temp" + jmbgTb.Text);
                         noviStudent.DatumRodjenja = datumRodjenjaTb.Text;
                         noviStudent.JMBG = jmbgTb.Text;
                         noviStudent.BrojTelefona = brojTelefonaTb.Text;
-                        
 
-                        kolekcijaIzbornihListi.FindOneAndReplace(Builders<IzbornaLista>.Filter.Eq("brojIndeksa", prethodnoSelektovanStudent.BrojIndeksa), postojecaIzbornaLista);
-                        kolekcijaLogin.FindOneAndReplace(Builders<Login>.Filter.Eq("brojIndeksa", prethodnoSelektovanStudent.BrojIndeksa), postojeciLogin);
+                        novaIzbornaLista.BrojIndeksa = noviStudent.BrojIndeksa;
+                        noviLogin.Password = noviStudent.ImePrezime.Split(' ')[0];
+                        noviLogin.Username = noviStudent.BrojIndeksa;
 
-                        MessageBox.Show("Student " + noviStudent.ImePrezime + " uspesno azuriran!");
-                        MessageBox.Show("Izborna lista uspesno azurirana!");
-                        MessageBox.Show("Nalog za pristup studentskom servisu azuriran!");
+                        if (!DuplikatStudenta(noviStudent.JMBG, noviStudent.BrojTelefona)
+                            && noviStudent.JMBG.Equals(prethodnoSelektovanStudent.JMBG)
+                            && noviStudent.BrojTelefona.Equals(prethodnoSelektovanStudent.BrojTelefona)
+                            )
+                        {
 
-                        buttonSaveIzmene.Enabled = false;
-                        buttonAddStudent.Enabled = true;
+                            kolekcijaStudenata.FindOneAndReplace(Builders<Studenti>.Filter.Eq("jmbg", prethodnoSelektovanStudent.JMBG), noviStudent);
+                            kolekcijaIzbornihListi.FindOneAndReplace(Builders<IzbornaLista>.Filter.Eq("brojIndeksa", prethodnoSelektovanStudent.BrojIndeksa), novaIzbornaLista);
+                            kolekcijaLogin.FindOneAndReplace(Builders<Login>.Filter.Eq("username", prethodnoSelektovanStudent.BrojIndeksa), noviLogin);
 
-                        GenerisiStudente();
+                            MessageBox.Show("Student " + noviStudent.ImePrezime + " uspesno azuriran!");
+                            MessageBox.Show("Izborna lista uspesno azurirana!");
+                            MessageBox.Show("Nalog za pristup studentskom servisu azuriran!");
+
+                            buttonSaveIzmene.Enabled = false;
+                            buttonAddStudent.Enabled = true;
+
+                            GenerisiStudente();
+                        }
+                        else
+                            MessageBox.Show("Student vec postoji u bazi!");
                     }
                     else
                     {
@@ -498,28 +448,31 @@ namespace tvp_projekat1
                             noviStudent.JMBG = jmbgTb.Text;
                             noviStudent.BrojTelefona = brojTelefonaTb.Text;
 
-                            IzbornaLista izbornaLista = new IzbornaLista();
-                            izbornaLista.Predmeti = new List<Predmeti>();
-                            izbornaLista.PredmetiDrugihSmerova = new List<Predmeti>();
-                            izbornaLista.BrojIndeksa = ((noviStudent.BrojIndeksa.Length > 0) ? noviStudent.BrojIndeksa : "temp");
+                            novaIzbornaLista.BrojIndeksa = noviStudent.BrojIndeksa;
+                            noviLogin.Password = noviStudent.ImePrezime.Split(' ')[0];
+                            noviLogin.Username = noviStudent.BrojIndeksa;
 
-                            Login login = new Login();
-                            login.AccountStatus = "student";
-                            login.Username = (noviStudent.BrojIndeksa.Length > 0) ? noviStudent.BrojIndeksa : noviStudent.ImePrezime.Split(' ')[0];
-                            login.Password = noviStudent.ImePrezime.Split(' ')[0];
+                            if (!DuplikatStudenta(noviStudent.JMBG, noviStudent.BrojTelefona)
+                            && noviStudent.JMBG.Equals(prethodnoSelektovanStudent.JMBG)
+                            && noviStudent.BrojTelefona.Equals(prethodnoSelektovanStudent.BrojTelefona)
+                            )
+                            {
 
-                            kolekcijaStudenata.FindOneAndReplace(Builders<Studenti>.Filter.Eq("jmbg", prethodnoSelektovanStudent.JMBG), noviStudent);
-                            // kolekcijaIzbornihListi.FindOneAndReplace(Builders<IzbornaLista>.Filter.Eq(), );
-                            kolekcijaLogin.InsertOne(login);
+                                kolekcijaStudenata.FindOneAndReplace(Builders<Studenti>.Filter.Eq("jmbg", prethodnoSelektovanStudent.JMBG), noviStudent);
+                                kolekcijaIzbornihListi.FindOneAndReplace(Builders<IzbornaLista>.Filter.Eq("brojIndeksa", prethodnoSelektovanStudent.BrojIndeksa), novaIzbornaLista);
+                                kolekcijaLogin.FindOneAndReplace(Builders<Login>.Filter.Eq("username", prethodnoSelektovanStudent.BrojIndeksa), noviLogin);
 
-                            MessageBox.Show("Student " + noviStudent.ImePrezime + " uspesno azuriran!");
-                            MessageBox.Show("Izborna lista uspesno azurirana!");
-                            MessageBox.Show("Nalog za pristup studentskom servisu azuriran!");
+                                MessageBox.Show("Student " + noviStudent.ImePrezime + " uspesno azuriran!");
+                                MessageBox.Show("Izborna lista uspesno azurirana!");
+                                MessageBox.Show("Nalog za pristup studentskom servisu azuriran!");
 
-                            buttonSaveIzmene.Enabled = false;
-                            buttonAddStudent.Enabled = true;
+                                buttonSaveIzmene.Enabled = false;
+                                buttonAddStudent.Enabled = true;
 
-                            GenerisiStudente();
+                                GenerisiStudente();
+                            }
+                            else
+                                MessageBox.Show("Student vec postoji u bazi!");
                         }
                         else
                         {
@@ -530,7 +483,7 @@ namespace tvp_projekat1
                 }
                 else
                 {
-                    MessageBox.Show("Greska u unosu! Polja za ime i prezime, datum rodjenja, broj telefona i JMBG su obavezna!");
+                    MessageBox.Show("Greska u unosu! Polja za ime i prezime, datum rodjenja, broj telefona, i JMBG su obavezna!");
                 }
             }
         }
@@ -598,12 +551,111 @@ namespace tvp_projekat1
             azuriranjePredmetaBtn.Enabled = false;
 
             flagZaSaveDugme = "predmet";
-            sacuvajIzmeneBtn.Click += (sender, ea) => SnimanjePredmeta(predmet);
+            sacuvajIzmeneBtn.Click += (sender, ea) => ObradaPredmeta(predmet);
         }
 
-        private void SnimanjePredmeta(Predmeti predmet)
+        private void ObradaPredmeta(Predmeti postojeciPredmet)
         {
-            
+            // if( predmet != null ) => AŽURIRANJE
+
+            TextBox sifraPredmetaTb = mainPanel.Controls.Find("sifraPredmetaTb", false)[0] as TextBox;
+            TextBox nazivPredmetaTb = mainPanel.Controls.Find("nazivPredmetaTb", false)[0] as TextBox;
+            TextBox profesorTb = mainPanel.Controls.Find("profesorTb", false)[0] as TextBox;
+            TextBox obavezanTb = mainPanel.Controls.Find("obavezanTb", false)[0] as TextBox;
+            TextBox espbTb = mainPanel.Controls.Find("espbTb", false)[0] as TextBox;
+            TextBox smeroviTb = mainPanel.Controls.Find("smeroviTb", false)[0] as TextBox;
+            TextBox semestarTb = mainPanel.Controls.Find("semestarTb", false)[0] as TextBox;
+
+            int semestar = 0;
+            int espb = 0;
+
+            bool errorFlag = false;
+
+            Predmeti noviPredmet = new Predmeti();
+
+            if (sifraPredmetaTb.Text.Length == 0 || nazivPredmetaTb.Text.Length == 0 ||
+                obavezanTb.Text.Length == 0 ||
+                espbTb.Text.Length == 0 || semestarTb.Text.Length == 0)
+            {
+                MessageBox.Show("Sva polja osim Profesor i Smerovi su obavezna! Pokusajte ponovo.");
+            }
+            else
+            {
+                if (Int32.TryParse(espbTb.Text, out espb)
+                && Int32.TryParse(semestarTb.Text, out semestar))
+                {
+                    string[] listaSmerovaString;
+                    List<Smerovi> listaSmerova = new List<Smerovi>();
+
+                    noviPredmet.ESPB = espb;
+                    noviPredmet.SifraPredmeta = sifraPredmetaTb.Text;
+                    noviPredmet.NazivPredmeta = nazivPredmetaTb.Text;
+                    noviPredmet.Obavezan = (obavezanTb.Text.Equals("Obavezan")) ? true : false;
+                    noviPredmet.Semestar = semestar;
+
+                    if (profesorTb.Text.Length == 0) noviPredmet.Profesor = ""; else noviPredmet.Profesor = profesorTb.Text;
+                    if (smeroviTb.Text.Length == 0) noviPredmet.SmeroviPredmeta = new List<Smerovi>();
+                    else
+                    {
+                        listaSmerovaString = smeroviTb.Text.Split(',');
+
+                        foreach (string smer in listaSmerovaString)
+                        {
+                            List<Smerovi> pronadjeniSmer = kolekcijaSmerova
+                                .Find(Builders<Smerovi>.Filter.Eq("nazivSmera", smer.Trim())).ToList();
+                            if (pronadjeniSmer.Count > 0)
+                                listaSmerova.Add(pronadjeniSmer[0]);
+                            else
+                            {
+                                MessageBox.Show("Uneti smerovi su neispravni ili nepostojeci!");
+                                listaSmerova = null;
+                                errorFlag = true;
+                                break;
+                            }
+
+                        }
+
+                        noviPredmet.SmeroviPredmeta = listaSmerova;
+                    }
+
+                    if (!errorFlag)
+                    {
+                        if(postojeciPredmet != null)
+                        {
+                            if (DuplikatPredmeta(noviPredmet.SifraPredmeta) && noviPredmet.SifraPredmeta.Equals(postojeciPredmet.SifraPredmeta))
+                            {
+                                noviPredmet.ID = postojeciPredmet.ID;
+                                kolekcijaPredmeta.FindOneAndReplace(Builders<Predmeti>.Filter.Eq("sifraPredmeta", postojeciPredmet.SifraPredmeta), noviPredmet);
+                                MessageBox.Show("Predmet " + noviPredmet.NazivPredmeta + " uspesno azuriran!");
+                            }
+                            else
+                                MessageBox.Show("Predmet sa sifrom " + noviPredmet.SifraPredmeta + " vec postoji u bazi!");
+                        }
+                        else
+                        {
+                            if (!DuplikatPredmeta(noviPredmet.SifraPredmeta))
+                            {
+                                kolekcijaPredmeta.InsertOne(noviPredmet);
+                                MessageBox.Show("Predmet " + noviPredmet.NazivPredmeta + " uspesno dodat!");
+                            }
+                            else
+                                MessageBox.Show("Predmet sa sifrom " + noviPredmet.SifraPredmeta + " vec postoji u bazi!");
+                        }
+
+                        sifraPredmetaTb.Enabled = nazivPredmetaTb.Enabled = profesorTb.Enabled =
+                            obavezanTb.Enabled = espbTb.Enabled = smeroviTb.Enabled = semestarTb.Enabled = false;
+
+                        buttonSaveIzmene.Enabled = false;
+                        buttonAddPredmet.Enabled = true;
+
+                        GenerisiPredmete();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Greska u unosu - sifra predmeta, ESPB, i semestar moraju biti brojevi!");
+                }
+            }
         }
 
         private void ComboBoxSmerChanged(object s, EventArgs e, IMongoCollection<Smerovi> kolekcijaSmerova, GenerisiKontrole generisiKontrole)
@@ -667,27 +719,77 @@ namespace tvp_projekat1
 
                 if (Int32.TryParse(idSmeraTb.Text, out noviIdSmera))
                 {
-                    noviSmer.SifraSmera = noviIdSmera;
-                    kolekcijaSmerova.FindOneAndReplace(Builders<Smerovi>.Filter.Eq("sifraSmera", prethodnoSelektovanSmer.SifraSmera), noviSmer);
+                    if (!DuplikatSmera(noviIdSmera) && noviIdSmera == prethodnoSelektovanSmer.SifraSmera)
+                    {
+                        noviSmer.SifraSmera = noviIdSmera;
+                        kolekcijaSmerova.FindOneAndReplace(Builders<Smerovi>.Filter.Eq("sifraSmera", prethodnoSelektovanSmer.SifraSmera), noviSmer);
 
-                    MessageBox.Show("Smer " + noviSmer.NazivSmera + " uspesno izmenjen!");
-                    idSmeraTb.Enabled = false;
-                    nazivSmeraTb.Enabled = false;
+                        MessageBox.Show("Smer " + noviSmer.NazivSmera + " uspesno izmenjen!");
+                        idSmeraTb.Enabled = false;
+                        nazivSmeraTb.Enabled = false;
 
-                    ((Button)(mainPanel.Controls.Find("brisanjeSmeraBtn", true))[0]).Enabled = false;
-                    ((Button)(mainPanel.Controls.Find("prikazStatistikeBtn", true))[0]).Enabled = false;
-                    ((Button)(mainPanel.Controls.Find("prikazStatistikeBtn", true))[0]).Enabled = false;
-                    ((Button)(mainPanel.Controls.Find("sacuvajIzmeneBtn", true))[0]).Enabled = false;
-                    
-                    GenerisiSmerove();
-                    GenerisiPredmete();
-                    GenerisiStudente();
+                        ((Button)(mainPanel.Controls.Find("brisanjeSmeraBtn", true))[0]).Enabled = false;
+                        ((Button)(mainPanel.Controls.Find("prikazStatistikeBtn", true))[0]).Enabled = false;
+                        ((Button)(mainPanel.Controls.Find("prikazStatistikeBtn", true))[0]).Enabled = false;
+                        ((Button)(mainPanel.Controls.Find("sacuvajIzmeneBtn", true))[0]).Enabled = false;
+
+                        GenerisiSmerove();
+                        GenerisiPredmete();
+                        GenerisiStudente();
+                    }
+                    else
+                        MessageBox.Show("Vec postoji smer sa sifrom " + noviIdSmera);
                 }
                 else
                 {
                     MessageBox.Show("Sifra smera mora biti broj! Pokusajte ponovo.");
                 }
             }
+        }
+
+        private bool DuplikatSmera(int idZaProveru)
+        {
+            bool result = false;
+            foreach(Smerovi s in sviSmerovi)
+            {
+                if(s.SifraSmera.Equals(idZaProveru))
+                {
+                    result = true;
+                    break;
+                }
+            }
+
+            return result;
+        }
+
+        private bool DuplikatStudenta(string jmbgZaProveru, string brojTelefonaZaProveru)
+        {
+            bool result = false;
+            foreach (Studenti s in sviStudenti)
+            {
+                if (s.JMBG.Equals(jmbgZaProveru) || s.BrojTelefona.Equals(brojTelefonaZaProveru))
+                {
+                    result = true;
+                    break;
+                }
+            }
+
+            return result;
+        }
+
+        private bool DuplikatPredmeta(string sifraZaProveru)
+        {
+            bool result = false;
+            foreach (Predmeti p in sviPredmeti)
+            {
+                if (p.SifraPredmeta.Equals(sifraZaProveru))
+                {
+                    result = true;
+                    break;
+                }
+            }
+
+            return result;
         }
 
         private void GenerisiKontroleZaSmerove(int brojKontrola)
