@@ -35,11 +35,11 @@ namespace tvp_projekat1
             var studenti = baza.GetCollection<BsonDocument>("studenti");
             var predmeti = baza.GetCollection<BsonDocument>("predmeti");
 
-            var student = studenti.Find(Builders<BsonDocument>.Filter.Eq("broj-indeksa", brojIndeksa)).First();
+            var student = studenti.Find(Builders<BsonDocument>.Filter.Eq("brojIndeksa", brojIndeksa)).First();
             var dostupniPredmetiCursor = predmeti.Find(new BsonDocument("smerovi", student["smerovi"])).ToCursor();
 
             /* LABELE SA LEVE STRANE */
-            labelImePrezime.Text += " " + student["ime-prezime"];
+            labelImePrezime.Text += " " + student["imePrezime"];
             labelBrIndeksa.Text += " " + this.brojIndeksa;
             labelBrojTelefona.Text += " " + student["brojTelefona"];
             labelDatumRodjenja.Text += " " + student["datumRodjenja"];

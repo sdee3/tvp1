@@ -20,6 +20,11 @@ namespace tvp_projekat1
         private IMongoCollection<IzbornaLista> kolekcijaIzbornihListi;
         private IMongoCollection<Login> kolekcijaLogin;
 
+        private List<Smerovi> sviSmerovi;
+        private List<Predmeti> sviPredmeti;
+        private List<Studenti> sviStudenti;
+        private List<IzbornaLista> sveIzborneListe;
+
         public adminForm()
         {
             InitializeComponent();
@@ -34,6 +39,11 @@ namespace tvp_projekat1
             kolekcijaPredmeta = Baza.VratiKolekcijuPredmeta();
             kolekcijaIzbornihListi = Baza.VratiIzbornuListu();
             kolekcijaLogin = Baza.VratiKolekcijuLogin();
+
+            sviSmerovi = kolekcijaSmerova.Find(new BsonDocument()).ToList();
+            sviPredmeti = kolekcijaPredmeta.Find(new BsonDocument()).ToList();
+            sviStudenti = kolekcijaStudenata.Find(new BsonDocument()).ToList();
+            sveIzborneListe = kolekcijaIzbornihListi.Find(new BsonDocument()).ToList();
 
             GenerisiSmerove();
             GenerisiPredmete();
@@ -400,29 +410,129 @@ namespace tvp_projekat1
             imePrezimeTb.Enabled = brojIndeksaTb.Enabled = datumRodjenjaTb.Enabled = smerTb.Enabled =
                 brojTelefonaTb.Enabled = jmbgTb.Enabled = false;
 
-            azuriranjeStudentaBtn.Click += (sender, ea) => AzuriranjeStudenta(imePrezimeTb, brojIndeksaTb, datumRodjenjaTb, smerTb, brojTelefonaTb, jmbgTb);
+            azuriranjeStudentaBtn.Click += (sender, ea) => AzuriranjeStudenta(student, imePrezimeTb, brojIndeksaTb, datumRodjenjaTb, smerTb, brojTelefonaTb, jmbgTb);
             brisanjeStudentaBtn.Click += (sender, ea) => BrisanjeStudenta(student);
         }
 
-        private void BrisanjeStudenta(Studenti student)
+        private void BrisanjeStudenta(Studenti prethodnoSelektovanStudent)
         {
             throw new NotImplementedException();
         }
 
-        private void AzuriranjeStudenta(TextBox imePrezimeTb, TextBox brojIndeksaTb, TextBox datumRodjenjaTb, TextBox smerTb, TextBox brojTelefonaTb, TextBox jmbgTb)
+        private void AzuriranjeStudenta(Studenti prethodnoSelektovanStudent, TextBox imePrezimeTb, TextBox brojIndeksaTb, TextBox datumRodjenjaTb, TextBox smerTb, TextBox brojTelefonaTb, TextBox jmbgTb)
         {
+            Button azuriranjeStudentaBtn = (Button)(mainPanel.Controls.Find("azuriranjeStudentaBtn", true))[0];
+            Button sacuvajIzmeneBtn = (Button)(mainPanel.Controls.Find("sacuvajIzmeneBtn", true))[0];
+
             imePrezimeTb.Enabled = brojIndeksaTb.Enabled = datumRodjenjaTb.Enabled = smerTb.Enabled =
                 brojTelefonaTb.Enabled = jmbgTb.Enabled = true;
 
-            Button sacuvajIzmeneBtn = (Button)(mainPanel.Controls.Find("sacuvajIzmeneBtn", true))[0];
             sacuvajIzmeneBtn.Enabled = true;
+            azuriranjeStudentaBtn.Enabled = false;
 
-            sacuvajIzmeneBtn.Click += (sender, ea) => SnimanjeStudenta();
+            flagZaSaveDugme = "student";
+            sacuvajIzmeneBtn.Click += (sender, ea) => SnimanjeStudenta(prethodnoSelektovanStudent);
         }
 
-        private void SnimanjeStudenta()
+        private void SnimanjeStudenta(Studenti prethodnoSelektovanStudent)
         {
-           
+            if (flagZaSaveDugme.Equals("student"))
+            {
+                TextBox imePrezimeTb = mainPanel.Controls.Find("imePrezimeTb", false)[0] as TextBox;
+                TextBox brojIndeksaTb = mainPanel.Controls.Find("brojIndeksaTb", false)[0] as TextBox;
+                TextBox datumRodjenjaTb = mainPanel.Controls.Find("datumRodjenjaTb", false)[0] as TextBox;
+                TextBox smerTb = mainPanel.Controls.Find("smerTb", false)[0] as TextBox;
+                TextBox brojTelefonaTb = mainPanel.Controls.Find("brojTelefonaTb", false)[0] as TextBox;
+                TextBox jmbgTb = mainPanel.Controls.Find("jmbgTb", false)[0] as TextBox;
+
+                Studenti noviStudent = new Studenti();
+                IzbornaLista novaIzbornaLista = new IzbornaLista();
+                Login noviLogin = new Login();
+
+                IzbornaLista postojecaIzbornaLista = kolekcijaIzbornihListi.Find(Builders<IzbornaLista>.Filter.Eq("brojIndeksa", prethodnoSelektovanStudent.BrojIndeksa)).First();
+                Login postojeciLogin = kolekcijaLogin.Find(Builders<Login>.Filter.Eq("username", prethodnoSelektovanStudent)).First();
+
+                noviStudent.ID = prethodnoSelektovanStudent.ID;
+
+                novaIzbornaLista.ID = postojecaIzbornaLista.ID;
+                novaIzbornaLista.Predmeti = postojecaIzbornaLista.Predmeti;
+                novaIzbornaLista.PredmetiDrugihSmerova = postojecaIzbornaLista.PredmetiDrugihSmerova;
+                
+                noviLogin.ID = postojeciLogin.ID;
+
+                if (imePrezimeTb.Text.Length > 0 && datumRodjenjaTb.Text.Length > 0 &&
+                    brojTelefonaTb.Text.Length > 0 && jmbgTb.Text.Length > 0)
+                {
+                    List<Smerovi> pronadjeniSmer = kolekcijaSmerova.Find(Builders<Smerovi>.Filter.Eq("nazivSmera", smerTb.Text)).ToList();
+
+                    if (smerTb.Text.Length == 0)
+                    {
+                        noviStudent.Smer = new Smerovi();
+                        noviStudent.ImePrezime = imePrezimeTb.Text;
+                        noviStudent.BrojIndeksa = (brojIndeksaTb.Text.Length > 0) ? brojIndeksaTb.Text : "temp";
+                        noviStudent.DatumRodjenja = datumRodjenjaTb.Text;
+                        noviStudent.JMBG = jmbgTb.Text;
+                        noviStudent.BrojTelefona = brojTelefonaTb.Text;
+                        
+
+                        kolekcijaIzbornihListi.FindOneAndReplace(Builders<IzbornaLista>.Filter.Eq("brojIndeksa", prethodnoSelektovanStudent.BrojIndeksa), postojecaIzbornaLista);
+                        kolekcijaLogin.FindOneAndReplace(Builders<Login>.Filter.Eq("brojIndeksa", prethodnoSelektovanStudent.BrojIndeksa), postojeciLogin);
+
+                        MessageBox.Show("Student " + noviStudent.ImePrezime + " uspesno azuriran!");
+                        MessageBox.Show("Izborna lista uspesno azurirana!");
+                        MessageBox.Show("Nalog za pristup studentskom servisu azuriran!");
+
+                        buttonSaveIzmene.Enabled = false;
+                        buttonAddStudent.Enabled = true;
+
+                        GenerisiStudente();
+                    }
+                    else
+                    {
+                        if (pronadjeniSmer.Count > 0)
+                        {
+                            noviStudent.Smer = pronadjeniSmer[0];
+                            noviStudent.ImePrezime = imePrezimeTb.Text;
+                            noviStudent.BrojIndeksa = (brojIndeksaTb.Text.Length > 0) ? brojIndeksaTb.Text : "";
+                            noviStudent.DatumRodjenja = datumRodjenjaTb.Text;
+                            noviStudent.JMBG = jmbgTb.Text;
+                            noviStudent.BrojTelefona = brojTelefonaTb.Text;
+
+                            IzbornaLista izbornaLista = new IzbornaLista();
+                            izbornaLista.Predmeti = new List<Predmeti>();
+                            izbornaLista.PredmetiDrugihSmerova = new List<Predmeti>();
+                            izbornaLista.BrojIndeksa = ((noviStudent.BrojIndeksa.Length > 0) ? noviStudent.BrojIndeksa : "temp");
+
+                            Login login = new Login();
+                            login.AccountStatus = "student";
+                            login.Username = (noviStudent.BrojIndeksa.Length > 0) ? noviStudent.BrojIndeksa : noviStudent.ImePrezime.Split(' ')[0];
+                            login.Password = noviStudent.ImePrezime.Split(' ')[0];
+
+                            kolekcijaStudenata.FindOneAndReplace(Builders<Studenti>.Filter.Eq("jmbg", prethodnoSelektovanStudent.JMBG), noviStudent);
+                            // kolekcijaIzbornihListi.FindOneAndReplace(Builders<IzbornaLista>.Filter.Eq(), );
+                            kolekcijaLogin.InsertOne(login);
+
+                            MessageBox.Show("Student " + noviStudent.ImePrezime + " uspesno azuriran!");
+                            MessageBox.Show("Izborna lista uspesno azurirana!");
+                            MessageBox.Show("Nalog za pristup studentskom servisu azuriran!");
+
+                            buttonSaveIzmene.Enabled = false;
+                            buttonAddStudent.Enabled = true;
+
+                            GenerisiStudente();
+                        }
+                        else
+                        {
+                            noviStudent.Smer = new Smerovi();
+                            MessageBox.Show("Uneti smer ne postoji!");
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Greska u unosu! Polja za ime i prezime, datum rodjenja, broj telefona i JMBG su obavezna!");
+                }
+            }
         }
 
         private void ComboBoxPredmetChanged(object s, EventArgs e, IMongoCollection<Predmeti> kolekcijaPredmeta, GenerisiKontrole generisiKontrole)
@@ -467,27 +577,31 @@ namespace tvp_projekat1
             sifraPredmetaTb.Enabled = nazivPredmetaTb.Enabled = profesorTb.Enabled = obavezanTb.Enabled = espbTb.Enabled =
                 smeroviTb.Enabled = semestarTb.Enabled = false;
 
-            azuriranjePredmetaBtn.Click += (sender, ea) => AzuriranjePredmeta(sifraPredmetaTb, nazivPredmetaTb, profesorTb, obavezanTb, espbTb, smeroviTb, semestarTb);
+            azuriranjePredmetaBtn.Click += (sender, ea) => AzuriranjePredmeta(predmet, sifraPredmetaTb, nazivPredmetaTb, profesorTb, obavezanTb, espbTb, smeroviTb, semestarTb);
             brisanjePredmetaBtn.Click += (sender, ea) => BrisanjePredmeta(predmet);
         }
 
-        private void BrisanjePredmeta(Predmeti predmet)
+        private void BrisanjePredmeta(Predmeti prethodnoSelektovanPredmet)
         {
             throw new NotImplementedException();
         }
 
-        private void AzuriranjePredmeta(TextBox sifraPredmetaTb, TextBox nazivPredmetaTb, TextBox profesorTb, TextBox obavezanTb, TextBox espbTb, TextBox smeroviTb, TextBox semestarTb)
+        private void AzuriranjePredmeta(Predmeti predmet, TextBox sifraPredmetaTb, TextBox nazivPredmetaTb, TextBox profesorTb, TextBox obavezanTb, TextBox espbTb, TextBox smeroviTb, TextBox semestarTb)
         {
+            Button azuriranjePredmetaBtn = (Button)(mainPanel.Controls.Find("azuriranjePredmetaBtn", true))[0];
+            Button sacuvajIzmeneBtn = (Button)(mainPanel.Controls.Find("sacuvajIzmeneBtn", true))[0];
+
             sifraPredmetaTb.Enabled = nazivPredmetaTb.Enabled = profesorTb.Enabled = obavezanTb.Enabled = espbTb.Enabled =
                 smeroviTb.Enabled = semestarTb.Enabled = true;
 
-            Button sacuvajIzmeneBtn = (Button)(mainPanel.Controls.Find("sacuvajIzmeneBtn", true))[0];
             sacuvajIzmeneBtn.Enabled = true;
+            azuriranjePredmetaBtn.Enabled = false;
 
-            sacuvajIzmeneBtn.Click += (sender, ea) => SnimanjePredmeta();
+            flagZaSaveDugme = "predmet";
+            sacuvajIzmeneBtn.Click += (sender, ea) => SnimanjePredmeta(predmet);
         }
 
-        private void SnimanjePredmeta()
+        private void SnimanjePredmeta(Predmeti predmet)
         {
             
         }
@@ -517,7 +631,7 @@ namespace tvp_projekat1
 
             idSmeraTb.Enabled = nazivSmeraTb.Enabled = false;
 
-            azuriranjeSmeraBtn.Click += (sender, ea) => AzuriranjeSmera(idSmeraTb, nazivSmeraTb);
+            azuriranjeSmeraBtn.Click += (sender, ea) => AzuriranjeSmera(smer, idSmeraTb, nazivSmeraTb);
             brisanjeSmeraBtn.Click += (sender, ea) => BrisanjeSmera(smer);
         }
 
@@ -526,18 +640,54 @@ namespace tvp_projekat1
             throw new NotImplementedException();
         }
 
-        private void AzuriranjeSmera(TextBox idSmeraTb, TextBox nazivSmeraTb)
+        private void AzuriranjeSmera(Smerovi prethodnoSelektovanStudent, TextBox idSmeraTb, TextBox nazivSmeraTb)
         {
-            idSmeraTb.Enabled = nazivSmeraTb.Enabled = true;
+            Button azuriranjeSmeraBtn = (Button)(mainPanel.Controls.Find("azuriranjeSmeraBtn", true))[0];
             Button sacuvajIzmeneBtn = (Button)(mainPanel.Controls.Find("sacuvajIzmeneBtn", true))[0];
+
+            idSmeraTb.Enabled = nazivSmeraTb.Enabled = true;
+            azuriranjeSmeraBtn.Enabled = false;
             sacuvajIzmeneBtn.Enabled = true;
 
-            sacuvajIzmeneBtn.Click += (sender, ea) => SnimanjeSmera();
+            sacuvajIzmeneBtn.Click += (sender, ea) => SnimanjeSmera(prethodnoSelektovanStudent);
+            flagZaSaveDugme = "smer";
         }
 
-        private void SnimanjeSmera()
+        private void SnimanjeSmera(Smerovi prethodnoSelektovanSmer)
         {
-            
+            if (flagZaSaveDugme.Equals("smer"))
+            {
+                int noviIdSmera = 0;
+                TextBox idSmeraTb = mainPanel.Controls.Find("idSmeraTb", false)[0] as TextBox;
+                TextBox nazivSmeraTb = mainPanel.Controls.Find("nazivSmeraTb", false)[0] as TextBox;
+
+                Smerovi noviSmer = new Smerovi();
+                noviSmer.ID = prethodnoSelektovanSmer.ID;
+                noviSmer.NazivSmera = nazivSmeraTb.Text;
+
+                if (Int32.TryParse(idSmeraTb.Text, out noviIdSmera))
+                {
+                    noviSmer.SifraSmera = noviIdSmera;
+                    kolekcijaSmerova.FindOneAndReplace(Builders<Smerovi>.Filter.Eq("sifraSmera", prethodnoSelektovanSmer.SifraSmera), noviSmer);
+
+                    MessageBox.Show("Smer " + noviSmer.NazivSmera + " uspesno izmenjen!");
+                    idSmeraTb.Enabled = false;
+                    nazivSmeraTb.Enabled = false;
+
+                    ((Button)(mainPanel.Controls.Find("brisanjeSmeraBtn", true))[0]).Enabled = false;
+                    ((Button)(mainPanel.Controls.Find("prikazStatistikeBtn", true))[0]).Enabled = false;
+                    ((Button)(mainPanel.Controls.Find("prikazStatistikeBtn", true))[0]).Enabled = false;
+                    ((Button)(mainPanel.Controls.Find("sacuvajIzmeneBtn", true))[0]).Enabled = false;
+                    
+                    GenerisiSmerove();
+                    GenerisiPredmete();
+                    GenerisiStudente();
+                }
+                else
+                {
+                    MessageBox.Show("Sifra smera mora biti broj! Pokusajte ponovo.");
+                }
+            }
         }
 
         private void GenerisiKontroleZaSmerove(int brojKontrola)
