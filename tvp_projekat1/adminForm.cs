@@ -136,7 +136,7 @@ namespace tvp_projekat1
         private void VerifikujIDodajPredmet(object sender, EventArgs e)
         {
             if(flagZaSaveDugme.Equals("predmet"))
-                ObradaPredmeta(null);                
+                SnimanjePredmeta(null);                
         }
 
         private void buttonAddStudent_Click(object sender, EventArgs e)
@@ -551,10 +551,10 @@ namespace tvp_projekat1
             azuriranjePredmetaBtn.Enabled = false;
 
             flagZaSaveDugme = "predmet";
-            sacuvajIzmeneBtn.Click += (sender, ea) => ObradaPredmeta(predmet);
+            sacuvajIzmeneBtn.Click += (sender, ea) => SnimanjePredmeta(predmet);
         }
 
-        private void ObradaPredmeta(Predmeti postojeciPredmet)
+        private void SnimanjePredmeta(Predmeti postojeciPredmet)
         {
             // if( predmet != null ) => AŽURIRANJE
 
