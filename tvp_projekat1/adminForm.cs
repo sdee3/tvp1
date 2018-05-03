@@ -364,8 +364,6 @@ namespace tvp_projekat1
 
                 GenerisiStudente();
             }
-                
-            
         }
 
         private void AzuriranjeStudenta(Studenti prethodnoSelektovanStudent, TextBox imePrezimeTb, TextBox brojIndeksaTb, TextBox datumRodjenjaTb, TextBox smerTb, TextBox brojTelefonaTb, TextBox jmbgTb)
