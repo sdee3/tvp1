@@ -352,7 +352,20 @@ namespace tvp_projekat1
 
         private void BrisanjeStudenta(Studenti prethodnoSelektovanStudent)
         {
-            throw new NotImplementedException();
+            var confirmResult = MessageBox.Show("Da li sigurno zelite izbrisati studenta iz baze?", "Potvrda brisanja",  MessageBoxButtons.YesNo);
+            if (confirmResult == DialogResult.Yes)
+            {
+                kolekcijaStudenata.FindOneAndDelete(Builders<Studenti>.Filter.Eq("jmbg", prethodnoSelektovanStudent.JMBG));
+                MessageBox.Show("Student obrisan!");
+                kolekcijaLogin.FindOneAndDelete(Builders<Login>.Filter.Eq("username", prethodnoSelektovanStudent.BrojIndeksa));
+                MessageBox.Show("Nalog za pristup studentskom servisu obrisan!");
+                kolekcijaIzbornihListi.FindOneAndDelete(Builders<IzbornaLista>.Filter.Eq("brojIndeksa", prethodnoSelektovanStudent.BrojIndeksa));
+                MessageBox.Show("Lista izabranih predmeta studenta obrisana!");
+
+                GenerisiStudente();
+            }
+                
+            
         }
 
         private void AzuriranjeStudenta(Studenti prethodnoSelektovanStudent, TextBox imePrezimeTb, TextBox brojIndeksaTb, TextBox datumRodjenjaTb, TextBox smerTb, TextBox brojTelefonaTb, TextBox jmbgTb)
