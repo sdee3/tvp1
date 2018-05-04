@@ -110,6 +110,7 @@
             this.buttonStatistika.TabIndex = 8;
             this.buttonStatistika.Text = "Prikaz statistike";
             this.buttonStatistika.UseVisualStyleBackColor = true;
+            this.buttonStatistika.Click += new System.EventHandler(this.buttonStatistika_Click);
             // 
             // labelWelcome
             // 

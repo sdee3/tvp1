@@ -273,7 +273,7 @@ namespace tvp_projekat1
         private void GenerisiSmerove()
         {
             comboBoxSmerovi.Items.Clear();
-            List<Smerovi> sviSmerovi = kolekcijaSmerova.Find(new BsonDocument()).ToList();
+            sviSmerovi = kolekcijaSmerova.Find(new BsonDocument()).ToList();
             
             GenerisiKontrole generisiKontrole = new GenerisiKontrole(GenerisiKontroleZaSmerove);
 
@@ -288,7 +288,7 @@ namespace tvp_projekat1
         private void GenerisiPredmete()
         {
             comboBoxPredmeti.Items.Clear();
-            List<Predmeti> sviPredmeti = kolekcijaPredmeta.Find(new BsonDocument()).ToList();
+            sviPredmeti = kolekcijaPredmeta.Find(new BsonDocument()).ToList();
             GenerisiKontrole generisiKontrole = new GenerisiKontrole(GenerisiKontroleZaPredmete);
 
             foreach (var predmet in sviPredmeti)
@@ -301,7 +301,7 @@ namespace tvp_projekat1
         private void GenerisiStudente()
         {
             comboBoxStudenti.Items.Clear();
-            List<Studenti> sviStudenti = kolekcijaStudenata.Find(new BsonDocument()).ToList();
+            sviStudenti = kolekcijaStudenata.Find(new BsonDocument()).ToList();
             GenerisiKontrole generisiKontrole = new GenerisiKontrole(GenerisiKontroleZaStudente);
 
             foreach (var student in sviStudenti)
@@ -1123,5 +1123,22 @@ namespace tvp_projekat1
             
         }
 
+        private void buttonStatistika_Click(object sender, EventArgs e)
+        {
+            statForm statForm = new statForm();
+            Predmeti selektovanPredmet = new Predmeti();
+
+            foreach (Predmeti p in sviPredmeti)
+                if (p.NazivPredmeta.Equals(comboBoxPredmeti.SelectedItem))
+                {
+                    selektovanPredmet = p;
+                    break;
+                }
+
+            statForm.SetPredmet(selektovanPredmet, sviStudenti.Count, sveIzborneListe);
+            statForm.Size = new Size(450, 300);
+            statForm.StartPosition = FormStartPosition.CenterScreen;
+            statForm.Show();
+        }
     }
 }

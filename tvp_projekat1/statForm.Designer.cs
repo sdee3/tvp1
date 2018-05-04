@@ -61,6 +61,7 @@
             this.Name = "statForm";
             this.Text = "Statistika predmeta";
             this.Load += new System.EventHandler(this.statForm_Load);
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.statForm_Paint);
             this.ResumeLayout(false);
             this.PerformLayout();
 

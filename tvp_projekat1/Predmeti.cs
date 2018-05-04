@@ -32,5 +32,6 @@ namespace tvp_projekat1
 
         [BsonElement("smerovi")]
         public List<Smerovi> SmeroviPredmeta { get; set; }
+
     }
 }
