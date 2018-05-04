@@ -8,6 +8,9 @@ namespace tvp_projekat1
 {
     public partial class statForm : Form
     {
-        
+        private void statForm_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

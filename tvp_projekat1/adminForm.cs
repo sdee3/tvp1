@@ -547,7 +547,30 @@ namespace tvp_projekat1
 
         private void BrisanjePredmeta(Predmeti prethodnoSelektovanPredmet)
         {
-            throw new NotImplementedException();
+            bool nemaStudenata = true;
+
+            foreach(IzbornaLista i in sveIzborneListe)
+            {
+                if (!nemaStudenata) break;
+                foreach (Predmeti p in i.Predmeti)
+                    if (p.SifraPredmeta.Equals(prethodnoSelektovanPredmet.SifraPredmeta))
+                        nemaStudenata = false;
+                if (!nemaStudenata) break;
+                foreach (Predmeti p in i.PredmetiDrugihSmerova)
+                    if (p.SifraPredmeta.Equals(prethodnoSelektovanPredmet.SifraPredmeta))
+                        nemaStudenata = false;
+            }
+
+            var confirmResult = MessageBox.Show("Da li sigurno zelite izbrisati predmet iz baze?", "Potvrda brisanja", MessageBoxButtons.YesNo);
+            if (confirmResult == DialogResult.Yes && nemaStudenata)
+            {
+                kolekcijaPredmeta.FindOneAndDelete(Builders<Predmeti>.Filter.Eq("sifraPredmeta", prethodnoSelektovanPredmet.SifraPredmeta));
+                MessageBox.Show("Predmet obrisan!");
+
+                GenerisiPredmete();
+            }
+            else
+                MessageBox.Show("Greska! Da bi se predmet obrisao, mora da NEMA nijednog studenta koji ga slusa.");
         }
 
         private void AzuriranjePredmeta(Predmeti predmet, TextBox sifraPredmetaTb, TextBox nazivPredmetaTb, TextBox profesorTb, TextBox obavezanTb, TextBox espbTb, TextBox smeroviTb, TextBox semestarTb)
@@ -579,7 +602,6 @@ namespace tvp_projekat1
 
             int semestar = 0;
             int espb = 0;
-
             bool errorFlag = false;
 
             Predmeti noviPredmet = new Predmeti();
@@ -638,6 +660,7 @@ namespace tvp_projekat1
                                 noviPredmet.ID = postojeciPredmet.ID;
                                 kolekcijaPredmeta.FindOneAndReplace(Builders<Predmeti>.Filter.Eq("sifraPredmeta", postojeciPredmet.SifraPredmeta), noviPredmet);
                                 MessageBox.Show("Predmet " + noviPredmet.NazivPredmeta + " uspesno azuriran!");
+                                AzurirajIzborneListe(postojeciPredmet, noviPredmet);
                             }
                             else
                                 MessageBox.Show("Predmet sa sifrom " + noviPredmet.SifraPredmeta + " vec postoji u bazi!");
@@ -667,6 +690,37 @@ namespace tvp_projekat1
                     MessageBox.Show("Greska u unosu - sifra predmeta, ESPB, i semestar moraju biti brojevi!");
                 }
             }
+        }
+
+        private void AzurirajIzborneListe(Predmeti stariPredmet, Predmeti noviPredmet)
+        {
+            foreach(IzbornaLista izbornaLista in sveIzborneListe)
+            {
+                IzbornaLista novaIzbornaLista = new IzbornaLista();
+                novaIzbornaLista.Predmeti = new List<Predmeti>();
+                novaIzbornaLista.PredmetiDrugihSmerova = new List<Predmeti>();
+
+                foreach (Predmeti predmet in izbornaLista.Predmeti)
+                {
+                    novaIzbornaLista.ID = izbornaLista.ID;
+                    novaIzbornaLista.BrojIndeksa = izbornaLista.BrojIndeksa;
+
+                    if (predmet.SifraPredmeta.Equals(stariPredmet.SifraPredmeta))
+                        novaIzbornaLista.Predmeti.Add(noviPredmet);
+                    else
+                        novaIzbornaLista.Predmeti.Add(predmet);     
+                }
+
+                foreach (Predmeti predmetDrugogSmera in izbornaLista.PredmetiDrugihSmerova)
+                    if (predmetDrugogSmera.Equals(stariPredmet))
+                        novaIzbornaLista.PredmetiDrugihSmerova.Add(noviPredmet);
+                    else
+                        novaIzbornaLista.PredmetiDrugihSmerova.Add(predmetDrugogSmera);
+
+                kolekcijaIzbornihListi.ReplaceOne(Builders<IzbornaLista>.Filter.Eq("brojIndeksa", izbornaLista.BrojIndeksa), novaIzbornaLista);
+            }
+
+            MessageBox.Show("Izborne liste azurirane!");
         }
 
         private void ComboBoxSmerChanged(object s, EventArgs e, IMongoCollection<Smerovi> kolekcijaSmerova, GenerisiKontrole generisiKontrole)
@@ -700,7 +754,39 @@ namespace tvp_projekat1
 
         private void BrisanjeSmera(Smerovi smer)
         {
-            throw new NotImplementedException();
+            bool nemaPredmeta = true;
+            bool nemaStudenata = true;
+
+            foreach(Predmeti p in sviPredmeti)
+            {
+                if (!nemaPredmeta) break;
+                foreach (Smerovi s in p.SmeroviPredmeta)
+                    if (s.SifraSmera == smer.SifraSmera)
+                    {
+                        nemaPredmeta = false;
+                        break;
+                    }    
+            }
+
+            foreach (Studenti s in sviStudenti)
+            {
+                if(s.Smer.SifraSmera == smer.SifraSmera)
+                {
+                    nemaStudenata = false;
+                    break;
+                }
+            }
+
+            var confirmResult = MessageBox.Show("Da li sigurno zelite izbrisati smer iz baze?", "Potvrda brisanja", MessageBoxButtons.YesNo);
+            if (confirmResult == DialogResult.Yes && nemaPredmeta && nemaStudenata)
+            {
+                kolekcijaSmerova.FindOneAndDelete(Builders<Smerovi>.Filter.Eq("sifraSmera", smer.SifraSmera));
+                MessageBox.Show("Smer obrisan!");
+
+                GenerisiSmerove();
+            }
+            else
+                MessageBox.Show("Greska! Da bi se smer obrisao, mora da NEMA ni predmete ni studente upisane na njemu.");
         }
 
         private void AzuriranjeSmera(Smerovi prethodnoSelektovanStudent, TextBox idSmeraTb, TextBox nazivSmeraTb)
