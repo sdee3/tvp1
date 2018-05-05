@@ -426,8 +426,7 @@ namespace tvp_projekat1
                         noviLogin.Password = noviStudent.ImePrezime.Split(' ')[0];
                         noviLogin.Username = noviStudent.BrojIndeksa;
 
-                        if (!DuplikatStudenta(noviStudent.JMBG, noviStudent.BrojTelefona)
-                            && noviStudent.JMBG.Equals(prethodnoSelektovanStudent.JMBG)
+                        if (noviStudent.JMBG.Equals(prethodnoSelektovanStudent.JMBG)
                             && noviStudent.BrojTelefona.Equals(prethodnoSelektovanStudent.BrojTelefona)
                             )
                         {
@@ -463,8 +462,7 @@ namespace tvp_projekat1
                             noviLogin.Password = noviStudent.ImePrezime.Split(' ')[0];
                             noviLogin.Username = noviStudent.BrojIndeksa;
 
-                            if (!DuplikatStudenta(noviStudent.JMBG, noviStudent.BrojTelefona)
-                            && noviStudent.JMBG.Equals(prethodnoSelektovanStudent.JMBG)
+                            if (noviStudent.JMBG.Equals(prethodnoSelektovanStudent.JMBG)
                             && noviStudent.BrojTelefona.Equals(prethodnoSelektovanStudent.BrojTelefona)
                             )
                             {
@@ -1104,6 +1102,7 @@ namespace tvp_projekat1
             izbornaListaBtn.Size = new Size(100, 50);
             izbornaListaBtn.Location = new Point(275, (pocetnaYOsa + razmakYOsa));
             izbornaListaBtn.Name = "izbornaListaBtn";
+            izbornaListaBtn.Click += buttonIzbornaListaStudenta_Click;
 
             sacuvajIzmeneBtn.Text = "Sačuvaj izmene";
             sacuvajIzmeneBtn.Size = new Size(100, 50);
@@ -1120,7 +1119,21 @@ namespace tvp_projekat1
 
         private void buttonIzbornaListaStudenta_Click(object sender, EventArgs e)
         {
-            
+            izbornaListaForm izbornaListaForm = new izbornaListaForm();
+            Studenti selektovanStudent = new Studenti();
+            IzbornaLista izbornaListaStudenta = new IzbornaLista();
+
+            foreach(Studenti s in sviStudenti)
+                if(s.BrojIndeksa.Equals(comboBoxStudenti.SelectedItem))
+                {
+                    Console.WriteLine("Pronadjen student!");
+                    selektovanStudent = s;
+                    izbornaListaStudenta = Baza.VratiKolekcijuPredmetaStudenta(s.BrojIndeksa);
+                    break;
+                }
+
+            izbornaListaForm.SetStudentInfo(selektovanStudent, izbornaListaStudenta);
+            izbornaListaForm.Show();
         }
 
         private void buttonStatistika_Click(object sender, EventArgs e)

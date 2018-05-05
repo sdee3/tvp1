@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,15 +51,31 @@ namespace tvp_projekat1
             return baza.GetCollection<Login>("login");
         }
 
-        public static List<IzbornaLista> VratiKolekcijuIzbPredmeta(string brojIndeksa)
+        public static IzbornaLista VratiKolekcijuPredmetaStudenta(string brojIndeksa)
         {
-            IMongoCollection<IzbornaLista> sveListe = baza.GetCollection<IzbornaLista>("predmetiDrugihSmerova");
-            List<IzbornaLista> listaStudenta = 
-                sveListe
-                    .Find(Builders<IzbornaLista>.Filter.Eq("brojIndeksa", brojIndeksa))
-                    .ToList();
+            IMongoCollection<IzbornaLista> sveListe = baza.GetCollection<IzbornaLista>("izbornaLista");
+            IzbornaLista listaStudenta = sveListe.Find(Builders<IzbornaLista>.Filter.Eq("brojIndeksa", brojIndeksa)).First();
 
             return listaStudenta;
+        }
+
+        public static Predmeti VratiPredmetPoNazivu(string nazivPredmeta)
+        {
+            IMongoCollection<Predmeti> sviPredmetiCollection = baza.GetCollection<Predmeti>("predmeti");
+            List<Predmeti> sviPredmeti = sviPredmetiCollection.Find(new BsonDocument()).ToList();
+            Predmeti pronadjenPredmet = new Predmeti();
+
+            foreach (Predmeti p in sviPredmeti)
+                if (p.NazivPredmeta.Equals(nazivPredmeta))
+                {
+                    pronadjenPredmet = p;
+                    break;
+                }
+
+            if (pronadjenPredmet != null)
+                return pronadjenPredmet;
+            else
+                return null;
         }
 
     }

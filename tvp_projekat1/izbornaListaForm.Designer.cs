@@ -28,33 +28,33 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
+            this.labelPredmetiSmera = new System.Windows.Forms.Label();
+            this.labelPredmetiDrSmerova = new System.Windows.Forms.Label();
             this.textBoxPredmetiSmera = new System.Windows.Forms.TextBox();
             this.textBoxPredmetiDrugihSmerova = new System.Windows.Forms.TextBox();
             this.buttonAzuriraj = new System.Windows.Forms.Button();
             this.buttonSaveIzmene = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // label1
+            // labelPredmetiSmera
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(32, 9);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(137, 18);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Predmeti sa smera:";
+            this.labelPredmetiSmera.AutoSize = true;
+            this.labelPredmetiSmera.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelPredmetiSmera.Location = new System.Drawing.Point(32, 9);
+            this.labelPredmetiSmera.Name = "labelPredmetiSmera";
+            this.labelPredmetiSmera.Size = new System.Drawing.Size(137, 18);
+            this.labelPredmetiSmera.TabIndex = 0;
+            this.labelPredmetiSmera.Text = "Predmeti sa smera:";
             // 
-            // label2
+            // labelPredmetiDrSmerova
             // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(31, 243);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(197, 18);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "Predmeti sa drugih smerova:";
+            this.labelPredmetiDrSmerova.AutoSize = true;
+            this.labelPredmetiDrSmerova.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelPredmetiDrSmerova.Location = new System.Drawing.Point(31, 243);
+            this.labelPredmetiDrSmerova.Name = "labelPredmetiDrSmerova";
+            this.labelPredmetiDrSmerova.Size = new System.Drawing.Size(197, 18);
+            this.labelPredmetiDrSmerova.TabIndex = 1;
+            this.labelPredmetiDrSmerova.Text = "Predmeti sa drugih smerova:";
             // 
             // textBoxPredmetiSmera
             // 
@@ -84,6 +84,7 @@
             this.buttonAzuriraj.TabIndex = 4;
             this.buttonAzuriraj.Text = "Azuriraj podatke";
             this.buttonAzuriraj.UseVisualStyleBackColor = true;
+            this.buttonAzuriraj.Click += new System.EventHandler(this.buttonAzuriraj_Click);
             // 
             // buttonSaveIzmene
             // 
@@ -93,6 +94,7 @@
             this.buttonSaveIzmene.TabIndex = 5;
             this.buttonSaveIzmene.Text = "Sacuvaj izmene";
             this.buttonSaveIzmene.UseVisualStyleBackColor = true;
+            this.buttonSaveIzmene.Click += new System.EventHandler(this.buttonSaveIzmene_Click);
             // 
             // izbornaListaForm
             // 
@@ -103,8 +105,8 @@
             this.Controls.Add(this.buttonAzuriraj);
             this.Controls.Add(this.textBoxPredmetiDrugihSmerova);
             this.Controls.Add(this.textBoxPredmetiSmera);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.labelPredmetiDrSmerova);
+            this.Controls.Add(this.labelPredmetiSmera);
             this.Name = "izbornaListaForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Izborna lista";
@@ -116,8 +118,8 @@
 
         #endregion
 
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label labelPredmetiSmera;
+        private System.Windows.Forms.Label labelPredmetiDrSmerova;
         private System.Windows.Forms.TextBox textBoxPredmetiSmera;
         private System.Windows.Forms.TextBox textBoxPredmetiDrugihSmerova;
         private System.Windows.Forms.Button buttonAzuriraj;
