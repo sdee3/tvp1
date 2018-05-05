@@ -44,6 +44,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.labelWarning = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.checkedListBox = new System.Windows.Forms.CheckedListBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -209,11 +210,21 @@
             this.label1.TabIndex = 20;
             this.label1.Text = "** Moguće je izabrati samo jedan\r\npredmet sa liste.";
             // 
+            // checkedListBox
+            // 
+            this.checkedListBox.FormattingEnabled = true;
+            this.checkedListBox.Location = new System.Drawing.Point(362, 70);
+            this.checkedListBox.Name = "checkedListBox";
+            this.checkedListBox.Size = new System.Drawing.Size(329, 214);
+            this.checkedListBox.TabIndex = 21;
+            this.checkedListBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.checkedListBox_ItemCheck);
+            // 
             // studentForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(734, 461);
+            this.Controls.Add(this.checkedListBox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.labelWarning);
             this.Controls.Add(this.groupBox1);
@@ -254,5 +265,6 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label labelWarning;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.CheckedListBox checkedListBox;
     }
 }

@@ -11,9 +11,13 @@ namespace tvp_projekat1
     public partial class studentForm : Form
     {
         private string brojIndeksa;
-        private int razmakYOsa;
         private int brojacESPB;
-        private List<CheckBox> checkboxListaPredmeta;
+        private Studenti student;
+
+        private IMongoCollection<Studenti> kolekcijaStudenata;
+        private IMongoCollection<Predmeti> kolekcijaSvihPredmeta;
+
+        private List<Predmeti> sviPredmeti;
 
         public studentForm()
         {
@@ -23,91 +27,109 @@ namespace tvp_projekat1
         public studentForm(string brojIndeksa) : this()
         {
             this.brojIndeksa = brojIndeksa;
-            razmakYOsa = 10;
             brojacESPB = 0;
-            checkboxListaPredmeta = new List<CheckBox>();
         }
 
         private void studentForm_Load(object sender, EventArgs e)
         {
-            var baza = new MongoClient("mongodb://sdee3:sdee3@ds147964.mlab.com:47964/tvp").GetDatabase("tvp");
+            Baza.GetBaza();
+            kolekcijaStudenata = Baza.VratiKolekcijuStudenata();
+            kolekcijaSvihPredmeta = Baza.VratiKolekcijuPredmeta();
+            sviPredmeti = kolekcijaSvihPredmeta.Find(new BsonDocument()).ToList();
 
-            var studenti = baza.GetCollection<BsonDocument>("studenti");
-            var predmeti = baza.GetCollection<BsonDocument>("predmeti");
-
-            var student = studenti.Find(Builders<BsonDocument>.Filter.Eq("brojIndeksa", brojIndeksa)).First();
-            var dostupniPredmetiCursor = predmeti.Find(new BsonDocument("smerovi", student["smerovi"])).ToCursor();
+            student = kolekcijaStudenata.Find(Builders<Studenti>.Filter.Eq("brojIndeksa", brojIndeksa)).First();
 
             /* LABELE SA LEVE STRANE */
-            labelImePrezime.Text += " " + student["imePrezime"];
-            labelBrIndeksa.Text += " " + this.brojIndeksa;
-            labelBrojTelefona.Text += " " + student["brojTelefona"];
-            labelDatumRodjenja.Text += " " + student["datumRodjenja"];
-            labelJMBG.Text += " " + student["jmbg"];
-            labelSmer.Text += " " + (student["smerovi"])["nazivSmera"];
+            labelImePrezime.Text += " " + student.ImePrezime;
+            labelBrIndeksa.Text += " " + student.BrojIndeksa;
+            labelBrojTelefona.Text += " " + student.BrojTelefona;
+            labelDatumRodjenja.Text += " " + student.DatumRodjenja;
+            labelJMBG.Text += " " + student.JMBG;
+            labelSmer.Text += " " + student.Smer.NazivSmera;
+
+            int brojac = 0;
 
             /* LISTA DOSTUPNIH PREDMETA */
-            foreach (var predmet in dostupniPredmetiCursor.ToEnumerable())
+            foreach (Predmeti predmet in sviPredmeti)
             {
-                CheckBox noviPredmet = new CheckBox();
-                noviPredmet.Text = predmet["nazivPredmeta"].ToString();
-                noviPredmet.Location = new Point(375, (65 + (razmakYOsa += 7)));
-                noviPredmet.BringToFront();
+                bool flag = false;
 
-                noviPredmet.CheckedChanged += (s, ea) => CheckBoxStateChanged(s, ea, predmet);
-                if (predmet["obavezan"] == true)
+                foreach (Smerovi s in predmet.SmeroviPredmeta)
+                    if (s.NazivSmera.Equals(student.Smer.NazivSmera))
+                    {
+                        flag = true;
+                        break;
+                    }
+
+                if (flag)
                 {
-                    noviPredmet.Checked = true;
-                    noviPredmet.Enabled = false;
+                    checkedListBox.Items.Add(predmet.NazivPredmeta);
+                    if (predmet.Obavezan)
+                    {
+                        checkedListBox.SetItemCheckState(brojac++, CheckState.Indeterminate);
+                    }
+                    else brojac++;
+
+                    flag = false;
+                }
+            }
+            
+            SortirajPredmete();
+            GenerisiPredmeteDrugihSmerova(sviPredmeti);
+        }
+
+        private void GenerisiPredmeteDrugihSmerova(List<Predmeti> sviPredmeti)
+        {
+            bool flag = false;
+
+            foreach (Predmeti p in sviPredmeti)
+            {
+                foreach (Smerovi s in p.SmeroviPredmeta)
+                {
+                    if (s.NazivSmera.Equals(student.Smer.NazivSmera))
+                    {
+                        flag = true;
+                        break;
+                    }
                 }
 
-                checkboxListaPredmeta.Add(noviPredmet);
+                if (!flag)
+                    comboBoxPredmetiDrugihSmerova.Items.Add(p.NazivPredmeta);
+                else flag = false;
             }
-
-            SortirajIDodajCheckBoxListu();
-
-            GenerisiPredmeteDrugihSmerova(student, predmeti);
         }
 
-        private void GenerisiPredmeteDrugihSmerova(BsonDocument student, IMongoCollection<BsonDocument> predmeti)
+        private void SortirajPredmete()
         {
-            var dostupniPredmetiCursor = predmeti.Find(Builders<BsonDocument>.Filter.Not(new BsonDocument("smerovi", student["smerovi"]))).ToCursor();
-            foreach (var predmet in dostupniPredmetiCursor.ToEnumerable())
+            
+        }
+
+        private void checkedListBox_ItemCheck(object s, ItemCheckEventArgs e)
+        {
+            Predmeti selektovanPredmet = Baza.VratiPredmetPoNazivu(checkedListBox.Items[e.Index].ToString());
+
+            if (e.NewValue == CheckState.Checked || e.NewValue == CheckState.Indeterminate)
             {
-                object noviPredmet = predmet["nazivPredmeta"].ToString();
-                comboBoxPredmetiDrugihSmerova.Items.Add(noviPredmet);
-                comboBoxPredmetiDrugihSmerova.SelectedIndexChanged += (s, ea) => ComboBoxChanged(s, ea, predmet);
+                brojacESPB += selektovanPredmet.ESPB;
+                labelSumaESPB.Text = brojacESPB.ToString();
             }
+            else if(e.NewValue == CheckState.Unchecked)
+            {
+                brojacESPB -= selektovanPredmet.ESPB;
+                labelSumaESPB.Text = brojacESPB.ToString();
+            }
+     
         }
 
-        private void SortirajIDodajCheckBoxListu()
+        private void ComboBoxChanged(object s, EventArgs e, Predmeti predmet)
         {
-            checkboxListaPredmeta.Sort();
-            foreach (CheckBox c in checkboxListaPredmeta)
-                this.Controls.Add(c);
-        }
-
-        private void CheckBoxStateChanged(object s, EventArgs e, BsonDocument predmet)
-        {
-            if((s as CheckBox).Checked)
-                brojacESPB += predmet["espb"].ToInt32();
-            else
-                brojacESPB -= predmet["espb"].ToInt32();
-
-            labelSumaESPB.Text = brojacESPB.ToString();
-
-            if(brojacESPB >= 48)
-                buttonPrijaviPredmete.Enabled = true;
-        }
-
-        private void ComboBoxChanged(object s, EventArgs e, BsonDocument predmet)
-        {
-            brojacESPB += predmet["espb"].ToInt32();
+            brojacESPB += predmet.ESPB;
             labelSumaESPB.Text = brojacESPB.ToString();
 
             if (brojacESPB >= 48)
                 buttonPrijaviPredmete.Enabled = true;
         }
+
     }
 
 }

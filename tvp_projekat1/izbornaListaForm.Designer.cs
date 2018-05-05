@@ -52,9 +52,9 @@
             this.labelPredmetiDrSmerova.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelPredmetiDrSmerova.Location = new System.Drawing.Point(31, 243);
             this.labelPredmetiDrSmerova.Name = "labelPredmetiDrSmerova";
-            this.labelPredmetiDrSmerova.Size = new System.Drawing.Size(197, 18);
+            this.labelPredmetiDrSmerova.Size = new System.Drawing.Size(194, 18);
             this.labelPredmetiDrSmerova.TabIndex = 1;
-            this.labelPredmetiDrSmerova.Text = "Predmeti sa drugih smerova:";
+            this.labelPredmetiDrSmerova.Text = "Predmet sa drugih smerova:";
             // 
             // textBoxPredmetiSmera
             // 
@@ -70,15 +70,14 @@
             // 
             this.textBoxPredmetiDrugihSmerova.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxPredmetiDrugihSmerova.Location = new System.Drawing.Point(34, 264);
-            this.textBoxPredmetiDrugihSmerova.Multiline = true;
             this.textBoxPredmetiDrugihSmerova.Name = "textBoxPredmetiDrugihSmerova";
             this.textBoxPredmetiDrugihSmerova.ReadOnly = true;
-            this.textBoxPredmetiDrugihSmerova.Size = new System.Drawing.Size(404, 216);
+            this.textBoxPredmetiDrugihSmerova.Size = new System.Drawing.Size(404, 22);
             this.textBoxPredmetiDrugihSmerova.TabIndex = 3;
             // 
             // buttonAzuriraj
             // 
-            this.buttonAzuriraj.Location = new System.Drawing.Point(35, 509);
+            this.buttonAzuriraj.Location = new System.Drawing.Point(35, 319);
             this.buttonAzuriraj.Name = "buttonAzuriraj";
             this.buttonAzuriraj.Size = new System.Drawing.Size(193, 30);
             this.buttonAzuriraj.TabIndex = 4;
@@ -88,7 +87,7 @@
             // 
             // buttonSaveIzmene
             // 
-            this.buttonSaveIzmene.Location = new System.Drawing.Point(245, 509);
+            this.buttonSaveIzmene.Location = new System.Drawing.Point(245, 319);
             this.buttonSaveIzmene.Name = "buttonSaveIzmene";
             this.buttonSaveIzmene.Size = new System.Drawing.Size(193, 30);
             this.buttonSaveIzmene.TabIndex = 5;
@@ -100,7 +99,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(484, 561);
+            this.ClientSize = new System.Drawing.Size(484, 361);
             this.Controls.Add(this.buttonSaveIzmene);
             this.Controls.Add(this.buttonAzuriraj);
             this.Controls.Add(this.textBoxPredmetiDrugihSmerova);
