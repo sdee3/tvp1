@@ -54,9 +54,7 @@ namespace tvp_projekat1
         public static IzbornaLista VratiKolekcijuPredmetaStudenta(string brojIndeksa)
         {
             IMongoCollection<IzbornaLista> sveListe = baza.GetCollection<IzbornaLista>("izbornaLista");
-            IzbornaLista listaStudenta = sveListe.Find(Builders<IzbornaLista>.Filter.Eq("brojIndeksa", brojIndeksa)).First();
-
-            return listaStudenta;
+            return sveListe.Find(Builders<IzbornaLista>.Filter.Eq("brojIndeksa", brojIndeksa)).First(); ;
         }
 
         public static Predmeti VratiPredmetPoNazivu(string nazivPredmeta)

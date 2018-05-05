@@ -17,6 +17,7 @@ namespace tvp_projekat1
         private IMongoCollection<Studenti> kolekcijaStudenata;
         private IMongoCollection<Predmeti> kolekcijaSvihPredmeta;
         private List<Predmeti> sviPredmeti;
+        private IzbornaLista izbornaListaStudenta;
 
         public studentForm()
         {
@@ -36,6 +37,7 @@ namespace tvp_projekat1
             kolekcijaSvihPredmeta = Baza.VratiKolekcijuPredmeta();
             sviPredmeti = kolekcijaSvihPredmeta.Find(new BsonDocument()).ToList();
             student = kolekcijaStudenata.Find(Builders<Studenti>.Filter.Eq("brojIndeksa", brojIndeksa)).First();
+            izbornaListaStudenta = Baza.VratiKolekcijuPredmetaStudenta(brojIndeksa);
 
             labelImePrezime.Text += " " + student.ImePrezime;
             labelBrIndeksa.Text += " " + student.BrojIndeksa;
@@ -48,20 +50,21 @@ namespace tvp_projekat1
             GenerisiPredmete();
             GenerisiPredmeteDrugihSmerova(sviPredmeti);
         }
-
+        
         private void SortirajPredmete()
         {
-            sviPredmeti.Sort((x,y) => x.Semestar.CompareTo(y.Semestar));
+            sviPredmeti.Sort((x,y) => 
+            {
+                int result = x.Semestar.CompareTo(y.Semestar);
+                return result != 0 ? result : x.NazivPredmeta.CompareTo(y.NazivPredmeta);
+            });
         }
 
         private void GenerisiPredmete()
         {
-            int brojac = 0;
-
             foreach (Predmeti predmet in sviPredmeti)
             {
                 bool flag = false;
-
                 foreach (Smerovi s in predmet.SmeroviPredmeta)
                     if (s.NazivSmera.Equals(student.Smer.NazivSmera))
                     {
@@ -73,10 +76,11 @@ namespace tvp_projekat1
                 {
                     checkedListBox.Items.Add(predmet.NazivPredmeta);
                     if (predmet.Obavezan)
-                    {
-                        checkedListBox.SetItemCheckState(brojac++, CheckState.Indeterminate);
-                    }
-                    else brojac++;
+                        checkedListBox.SetItemCheckState(checkedListBox.Items.IndexOf(predmet.NazivPredmeta), CheckState.Checked);
+                    else
+                        foreach (Predmeti p in izbornaListaStudenta.Predmeti)
+                            if (p.NazivPredmeta.Equals(predmet.NazivPredmeta))
+                                checkedListBox.SetItemCheckState(checkedListBox.Items.IndexOf(predmet.NazivPredmeta), CheckState.Checked);
 
                     flag = false;
                 }
@@ -86,7 +90,6 @@ namespace tvp_projekat1
         private void GenerisiPredmeteDrugihSmerova(List<Predmeti> sviPredmeti)
         {
             bool flag = false;
-
             foreach (Predmeti p in sviPredmeti)
             {
                 foreach (Smerovi s in p.SmeroviPredmeta)
@@ -98,12 +101,17 @@ namespace tvp_projekat1
                     }
                 }
 
-                if (!flag)
-                {
-                    comboBoxPredmetiDrugihSmerova.Items.Add(p.NazivPredmeta);
-                }
+                if (!flag) comboBoxPredmetiDrugihSmerova.Items.Add(p.NazivPredmeta);
                 else flag = false;
             }
+
+            foreach (Predmeti p in izbornaListaStudenta.PredmetiDrugihSmerova)
+                foreach(string naziviPredmeta in comboBoxPredmetiDrugihSmerova.Items)
+                if (p.NazivPredmeta.Equals(naziviPredmeta))
+                {
+                    comboBoxPredmetiDrugihSmerova.SelectedItem = p.NazivPredmeta;
+                    break;
+                }
         }
 
         private void ProveraESPBBodova()
@@ -127,7 +135,7 @@ namespace tvp_projekat1
         {
             Predmeti selektovanPredmet = Baza.VratiPredmetPoNazivu(checkedListBox.Items[e.Index].ToString());
 
-            if (e.NewValue == CheckState.Checked || e.NewValue == CheckState.Indeterminate)
+            if (e.NewValue == CheckState.Checked)
             {
                 brojacESPB += selektovanPredmet.ESPB;
                 labelSumaESPB.Text = brojacESPB.ToString();
@@ -135,10 +143,20 @@ namespace tvp_projekat1
             }
             else if(e.NewValue == CheckState.Unchecked)
             {
-                brojacESPB -= selektovanPredmet.ESPB;
-                labelSumaESPB.Text = brojacESPB.ToString();
-                ProveraESPBBodova();
+                if (selektovanPredmet.Obavezan)
+                    e.NewValue = CheckState.Checked;
+                else
+                {
+                    brojacESPB -= selektovanPredmet.ESPB;
+                    labelSumaESPB.Text = brojacESPB.ToString();
+                    ProveraESPBBodova();
+                }
             }
+        }
+
+        private void buttonPrijaviPredmete_Click(object sender, EventArgs e)
+        {
+
         }
     }
 

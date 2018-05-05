@@ -110,13 +110,14 @@
             // buttonPrijaviPredmete
             // 
             this.buttonPrijaviPredmete.Enabled = false;
-            this.buttonPrijaviPredmete.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonPrijaviPredmete.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonPrijaviPredmete.Location = new System.Drawing.Point(18, 389);
             this.buttonPrijaviPredmete.Name = "buttonPrijaviPredmete";
             this.buttonPrijaviPredmete.Size = new System.Drawing.Size(196, 39);
             this.buttonPrijaviPredmete.TabIndex = 8;
             this.buttonPrijaviPredmete.Text = "Prijavi predmete*";
             this.buttonPrijaviPredmete.UseVisualStyleBackColor = true;
+            this.buttonPrijaviPredmete.Click += new System.EventHandler(this.buttonPrijaviPredmete_Click);
             // 
             // labelImePrezime
             // 
@@ -205,11 +206,12 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(526, 398);
+            this.label1.Location = new System.Drawing.Point(526, 374);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(161, 26);
+            this.label1.Size = new System.Drawing.Size(193, 78);
             this.label1.TabIndex = 20;
-            this.label1.Text = "** Moguće je izabrati samo jedan\r\npredmet sa liste.";
+            this.label1.Text = "Moguće je izabrati samo jedan\r\npredmet sa liste.\r\n\r\nUkoliko se pojavi predmet nak" +
+    "on \r\nučitavanja forme, molimo Vas da \r\npotvrdite predmet njegovom selekcijom.";
             // 
             // checkedListBox
             // 
