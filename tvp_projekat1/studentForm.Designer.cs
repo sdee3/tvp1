@@ -56,6 +56,7 @@
             this.comboBoxPredmetiDrugihSmerova.Name = "comboBoxPredmetiDrugihSmerova";
             this.comboBoxPredmetiDrugihSmerova.Size = new System.Drawing.Size(193, 21);
             this.comboBoxPredmetiDrugihSmerova.TabIndex = 0;
+            this.comboBoxPredmetiDrugihSmerova.SelectionChangeCommitted += new System.EventHandler(this.ComboBoxPredmetiDrugihSmerova_SelectedValueChanged);
             // 
             // labelPredmetiDrugihSmerova
             // 

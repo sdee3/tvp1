@@ -16,7 +16,6 @@ namespace tvp_projekat1
 
         private IMongoCollection<Studenti> kolekcijaStudenata;
         private IMongoCollection<Predmeti> kolekcijaSvihPredmeta;
-
         private List<Predmeti> sviPredmeti;
 
         public studentForm()
@@ -36,10 +35,8 @@ namespace tvp_projekat1
             kolekcijaStudenata = Baza.VratiKolekcijuStudenata();
             kolekcijaSvihPredmeta = Baza.VratiKolekcijuPredmeta();
             sviPredmeti = kolekcijaSvihPredmeta.Find(new BsonDocument()).ToList();
-
             student = kolekcijaStudenata.Find(Builders<Studenti>.Filter.Eq("brojIndeksa", brojIndeksa)).First();
 
-            /* LABELE SA LEVE STRANE */
             labelImePrezime.Text += " " + student.ImePrezime;
             labelBrIndeksa.Text += " " + student.BrojIndeksa;
             labelBrojTelefona.Text += " " + student.BrojTelefona;
@@ -47,9 +44,20 @@ namespace tvp_projekat1
             labelJMBG.Text += " " + student.JMBG;
             labelSmer.Text += " " + student.Smer.NazivSmera;
 
+            SortirajPredmete();
+            GenerisiPredmete();
+            GenerisiPredmeteDrugihSmerova(sviPredmeti);
+        }
+
+        private void SortirajPredmete()
+        {
+            sviPredmeti.Sort((x,y) => x.Semestar.CompareTo(y.Semestar));
+        }
+
+        private void GenerisiPredmete()
+        {
             int brojac = 0;
 
-            /* LISTA DOSTUPNIH PREDMETA */
             foreach (Predmeti predmet in sviPredmeti)
             {
                 bool flag = false;
@@ -73,9 +81,6 @@ namespace tvp_projekat1
                     flag = false;
                 }
             }
-            
-            SortirajPredmete();
-            GenerisiPredmeteDrugihSmerova(sviPredmeti);
         }
 
         private void GenerisiPredmeteDrugihSmerova(List<Predmeti> sviPredmeti)
@@ -94,14 +99,28 @@ namespace tvp_projekat1
                 }
 
                 if (!flag)
+                {
                     comboBoxPredmetiDrugihSmerova.Items.Add(p.NazivPredmeta);
+                }
                 else flag = false;
             }
         }
 
-        private void SortirajPredmete()
+        private void ProveraESPBBodova()
         {
-            
+            if (brojacESPB >= 48)
+                buttonPrijaviPredmete.Enabled = true;
+            else
+                buttonPrijaviPredmete.Enabled = false;
+        }
+
+        private void ComboBoxPredmetiDrugihSmerova_SelectedValueChanged(object sender, EventArgs e)
+        {
+            Predmeti selektovanPredmet = Baza.VratiPredmetPoNazivu(comboBoxPredmetiDrugihSmerova.SelectedItem.ToString());
+            brojacESPB += selektovanPredmet.ESPB;
+            labelSumaESPB.Text = brojacESPB.ToString();
+            comboBoxPredmetiDrugihSmerova.Enabled = false;
+            ProveraESPBBodova();
         }
 
         private void checkedListBox_ItemCheck(object s, ItemCheckEventArgs e)
@@ -112,24 +131,15 @@ namespace tvp_projekat1
             {
                 brojacESPB += selektovanPredmet.ESPB;
                 labelSumaESPB.Text = brojacESPB.ToString();
+                ProveraESPBBodova();
             }
             else if(e.NewValue == CheckState.Unchecked)
             {
                 brojacESPB -= selektovanPredmet.ESPB;
                 labelSumaESPB.Text = brojacESPB.ToString();
+                ProveraESPBBodova();
             }
-     
         }
-
-        private void ComboBoxChanged(object s, EventArgs e, Predmeti predmet)
-        {
-            brojacESPB += predmet.ESPB;
-            labelSumaESPB.Text = brojacESPB.ToString();
-
-            if (brojacESPB >= 48)
-                buttonPrijaviPredmete.Enabled = true;
-        }
-
     }
 
 }
