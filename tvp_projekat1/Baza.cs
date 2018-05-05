@@ -41,7 +41,7 @@ namespace tvp_projekat1
             return baza.GetCollection<Studenti>("studenti");
         }
 
-        public static IMongoCollection<IzbornaLista> VratiIzbornuListu()
+        public static IMongoCollection<IzbornaLista> VratiKolekcijuIzbornihLista()
         {
             return baza.GetCollection<IzbornaLista>("izbornaLista");
         }

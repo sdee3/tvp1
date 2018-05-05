@@ -16,6 +16,7 @@ namespace tvp_projekat1
 
         private IMongoCollection<Studenti> kolekcijaStudenata;
         private IMongoCollection<Predmeti> kolekcijaSvihPredmeta;
+        private IMongoCollection<IzbornaLista> kolekcijaIzbornihLista;
         private List<Predmeti> sviPredmeti;
         private IzbornaLista izbornaListaStudenta;
 
@@ -35,6 +36,7 @@ namespace tvp_projekat1
             Baza.GetBaza();
             kolekcijaStudenata = Baza.VratiKolekcijuStudenata();
             kolekcijaSvihPredmeta = Baza.VratiKolekcijuPredmeta();
+            kolekcijaIzbornihLista = Baza.VratiKolekcijuIzbornihLista();
             sviPredmeti = kolekcijaSvihPredmeta.Find(new BsonDocument()).ToList();
             student = kolekcijaStudenata.Find(Builders<Studenti>.Filter.Eq("brojIndeksa", brojIndeksa)).First();
             izbornaListaStudenta = Baza.VratiKolekcijuPredmetaStudenta(brojIndeksa);
@@ -156,7 +158,20 @@ namespace tvp_projekat1
 
         private void buttonPrijaviPredmete_Click(object sender, EventArgs e)
         {
+            List<Predmeti> selektovaniPredmeti = new List<Predmeti>();
+            List<Predmeti> selektovaniPredmetiDrugihSmerova = new List<Predmeti>();
 
+            foreach (string nazivPredmeta in checkedListBox.CheckedItems)
+                selektovaniPredmeti.Add(Baza.VratiPredmetPoNazivu(nazivPredmeta));
+
+            if (!comboBoxPredmetiDrugihSmerova.Enabled)
+                selektovaniPredmetiDrugihSmerova.Add(Baza.VratiPredmetPoNazivu(comboBoxPredmetiDrugihSmerova.SelectedItem.ToString()));
+
+            izbornaListaStudenta.Predmeti = selektovaniPredmeti;
+            izbornaListaStudenta.PredmetiDrugihSmerova = selektovaniPredmetiDrugihSmerova;
+
+            kolekcijaIzbornihLista.FindOneAndReplace(Builders<IzbornaLista>.Filter.Eq("brojIndeksa", student.BrojIndeksa), izbornaListaStudenta);
+            MessageBox.Show("Izborna lista uspesno azurirana!");
         }
     }
 

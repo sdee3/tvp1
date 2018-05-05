@@ -82,7 +82,7 @@ namespace tvp_projekat1
             List<Predmeti> noviPredmeti = new List<Predmeti>();
             List<Predmeti> noviPredmetiDrugihSmerova = new List<Predmeti>();
             IzbornaLista novaIzbornaLista = new IzbornaLista();
-            IMongoCollection<IzbornaLista> sveIzborneListeBaze = Baza.VratiIzbornuListu();
+            IMongoCollection<IzbornaLista> sveIzborneListeBaze = Baza.VratiKolekcijuIzbornihLista();
 
             buttonSaveIzmene.Enabled = false;
             buttonAzuriraj.Enabled = true;

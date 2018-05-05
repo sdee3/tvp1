@@ -37,7 +37,7 @@ namespace tvp_projekat1
             kolekcijaSmerova = Baza.VratiKolekcijuSmerova();
             kolekcijaStudenata = Baza.VratiKolekcijuStudenata();
             kolekcijaPredmeta = Baza.VratiKolekcijuPredmeta();
-            kolekcijaIzbornihListi = Baza.VratiIzbornuListu();
+            kolekcijaIzbornihListi = Baza.VratiKolekcijuIzbornihLista();
             kolekcijaLogin = Baza.VratiKolekcijuLogin();
 
             sviSmerovi = kolekcijaSmerova.Find(new BsonDocument()).ToList();
