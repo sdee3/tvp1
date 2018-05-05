@@ -690,19 +690,21 @@ namespace tvp_projekat1
             }
         }
 
+        // TODO immediate fix 
         private void AzurirajIzborneListe(Predmeti stariPredmet, Predmeti noviPredmet)
         {
+            sveIzborneListe = kolekcijaIzbornihListi.Find(new BsonDocument()).ToList();
             foreach(IzbornaLista izbornaLista in sveIzborneListe)
             {
                 IzbornaLista novaIzbornaLista = new IzbornaLista();
                 novaIzbornaLista.Predmeti = new List<Predmeti>();
                 novaIzbornaLista.PredmetiDrugihSmerova = new List<Predmeti>();
 
+                novaIzbornaLista.ID = izbornaLista.ID;
+                novaIzbornaLista.BrojIndeksa = izbornaLista.BrojIndeksa;
+
                 foreach (Predmeti predmet in izbornaLista.Predmeti)
                 {
-                    novaIzbornaLista.ID = izbornaLista.ID;
-                    novaIzbornaLista.BrojIndeksa = izbornaLista.BrojIndeksa;
-
                     if (predmet.SifraPredmeta.Equals(stariPredmet.SifraPredmeta))
                         novaIzbornaLista.Predmeti.Add(noviPredmet);
                     else
