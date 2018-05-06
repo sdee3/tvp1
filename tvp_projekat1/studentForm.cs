@@ -171,7 +171,12 @@ namespace tvp_projekat1
             izbornaListaStudenta.PredmetiDrugihSmerova = selektovaniPredmetiDrugihSmerova;
 
             kolekcijaIzbornihLista.FindOneAndReplace(Builders<IzbornaLista>.Filter.Eq("brojIndeksa", student.BrojIndeksa), izbornaListaStudenta);
-            MessageBox.Show("Izborna lista uspesno azurirana!");
+            MessageBox.Show("Izborna lista uspesno azurirana! Bicete preusmereni na ekran za pristup servisima...");
+
+            this.Hide();
+            loginForm loginForm = new loginForm();
+            loginForm.Closed += (s, args) => this.Close();
+            loginForm.Show();
         }
     }
 
