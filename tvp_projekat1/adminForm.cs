@@ -600,6 +600,7 @@ namespace tvp_projekat1
 
             int semestar = 0;
             int espb = 0;
+            int tmpSifraPredmeta = 0;
             bool errorFlag = false;
 
             Predmeti noviPredmet = new Predmeti();
@@ -613,7 +614,8 @@ namespace tvp_projekat1
             else
             {
                 if (Int32.TryParse(espbTb.Text, out espb)
-                && Int32.TryParse(semestarTb.Text, out semestar))
+                && Int32.TryParse(semestarTb.Text, out semestar)
+                && Int32.TryParse(sifraPredmetaTb.Text, out tmpSifraPredmeta))
                 {
                     string[] listaSmerovaString;
                     List<Smerovi> listaSmerova = new List<Smerovi>();
