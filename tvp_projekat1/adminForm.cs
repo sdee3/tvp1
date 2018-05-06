@@ -690,7 +690,6 @@ namespace tvp_projekat1
             }
         }
 
-        // TODO immediate fix 
         private void AzurirajIzborneListe(Predmeti stariPredmet, Predmeti noviPredmet)
         {
             sveIzborneListe = kolekcijaIzbornihListi.Find(new BsonDocument()).ToList();
@@ -816,12 +815,38 @@ namespace tvp_projekat1
 
                 if (Int32.TryParse(idSmeraTb.Text, out noviIdSmera))
                 {
-                    if (!DuplikatSmera(noviIdSmera) && noviIdSmera == prethodnoSelektovanSmer.SifraSmera)
+                    if (!DuplikatSmera(noviIdSmera) || noviIdSmera == prethodnoSelektovanSmer.SifraSmera)
                     {
                         noviSmer.SifraSmera = noviIdSmera;
                         kolekcijaSmerova.FindOneAndReplace(Builders<Smerovi>.Filter.Eq("sifraSmera", prethodnoSelektovanSmer.SifraSmera), noviSmer);
 
                         MessageBox.Show("Smer " + noviSmer.NazivSmera + " uspesno izmenjen!");
+
+                        foreach(Studenti s in sviStudenti)
+                            if (s.Smer.NazivSmera != null)
+                                if(s.Smer.NazivSmera.Equals(prethodnoSelektovanSmer.NazivSmera))
+                                    kolekcijaStudenata.FindOneAndUpdate(Builders<Studenti>.Filter.Eq("jmbg", s.JMBG),
+                                        Builders<Studenti>.Update.Set("smerovi", noviSmer));
+                        MessageBox.Show("Kolekcija studenata uspesno azurirana sa novim smerom!");
+
+                        foreach(Predmeti p in sviPredmeti)
+                        {
+                            List<Smerovi> listaSmerovaPredmeta = new List<Smerovi>();
+
+                            foreach (Smerovi s in p.SmeroviPredmeta)
+                            {
+                                if (s.NazivSmera.Equals(prethodnoSelektovanSmer.NazivSmera))
+                                {
+                                    listaSmerovaPredmeta.Add(noviSmer);
+                                }
+                                else
+                                    listaSmerovaPredmeta.Add(s);
+                            }
+                            kolekcijaPredmeta.FindOneAndUpdate(Builders<Predmeti>.Filter.Eq("sifraPredmeta", p.SifraPredmeta),
+                                  Builders<Predmeti>.Update.Set("smerovi", listaSmerovaPredmeta));
+                        }
+                        MessageBox.Show("Kolekcija predmeta uspesno azurirana sa novim smerom!");
+
                         idSmeraTb.Enabled = false;
                         nazivSmeraTb.Enabled = false;
 
