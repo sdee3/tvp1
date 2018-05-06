@@ -463,10 +463,8 @@ namespace tvp_projekat1
                             noviLogin.Username = noviStudent.BrojIndeksa;
 
                             if (noviStudent.JMBG.Equals(prethodnoSelektovanStudent.JMBG)
-                            && noviStudent.BrojTelefona.Equals(prethodnoSelektovanStudent.BrojTelefona)
                             )
                             {
-
                                 kolekcijaStudenata.FindOneAndReplace(Builders<Studenti>.Filter.Eq("jmbg", prethodnoSelektovanStudent.JMBG), noviStudent);
                                 kolekcijaIzbornihListi.FindOneAndReplace(Builders<IzbornaLista>.Filter.Eq("brojIndeksa", prethodnoSelektovanStudent.BrojIndeksa), novaIzbornaLista);
                                 kolekcijaLogin.FindOneAndReplace(Builders<Login>.Filter.Eq("username", prethodnoSelektovanStudent.BrojIndeksa), noviLogin);
@@ -481,7 +479,7 @@ namespace tvp_projekat1
                                 GenerisiStudente();
                             }
                             else
-                                MessageBox.Show("Student vec postoji u bazi!");
+                                MessageBox.Show("Student vec postoji u bazi! Takodje, nije dozvoljeno menjati JMBG studenta.");
                         }
                         else
                         {
