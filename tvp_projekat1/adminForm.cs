@@ -822,30 +822,88 @@ namespace tvp_projekat1
 
                         MessageBox.Show("Smer " + noviSmer.NazivSmera + " uspesno izmenjen!");
 
-                        foreach(Studenti s in sviStudenti)
+                        // Azuriranje svih studenata
+                        foreach (Studenti s in sviStudenti)
                             if (s.Smer.NazivSmera != null)
                                 if(s.Smer.NazivSmera.Equals(prethodnoSelektovanSmer.NazivSmera))
                                     kolekcijaStudenata.FindOneAndUpdate(Builders<Studenti>.Filter.Eq("jmbg", s.JMBG),
                                         Builders<Studenti>.Update.Set("smerovi", noviSmer));
                         MessageBox.Show("Kolekcija studenata uspesno azurirana sa novim smerom!");
 
-                        foreach(Predmeti p in sviPredmeti)
+                        GenerisiSmerove();
+                        GenerisiStudente();
+
+                        // Azuriranje svih predmeta
+                        foreach (Predmeti p in sviPredmeti)
                         {
-                            List<Smerovi> listaSmerovaPredmeta = new List<Smerovi>();
+                            List<Smerovi> novaListaSmerovaPredmeta = new List<Smerovi>();
 
                             foreach (Smerovi s in p.SmeroviPredmeta)
                             {
                                 if (s.NazivSmera.Equals(prethodnoSelektovanSmer.NazivSmera))
                                 {
-                                    listaSmerovaPredmeta.Add(noviSmer);
+                                    novaListaSmerovaPredmeta.Add(noviSmer);
                                 }
                                 else
-                                    listaSmerovaPredmeta.Add(s);
+                                    novaListaSmerovaPredmeta.Add(s);
                             }
                             kolekcijaPredmeta.FindOneAndUpdate(Builders<Predmeti>.Filter.Eq("sifraPredmeta", p.SifraPredmeta),
-                                  Builders<Predmeti>.Update.Set("smerovi", listaSmerovaPredmeta));
+                                  Builders<Predmeti>.Update.Set("smerovi", novaListaSmerovaPredmeta));
                         }
                         MessageBox.Show("Kolekcija predmeta uspesno azurirana sa novim smerom!");
+
+                        GenerisiPredmete();
+
+                        // Azuriranje izbornih lista
+                        foreach (IzbornaLista iL in sveIzborneListe)
+                        {
+                            List<Smerovi> novaListaSmerovaPredmeta = new List<Smerovi>();
+                            List<Predmeti> novaListaPredmeta = new List<Predmeti>();
+                            Predmeti tmpPredmet = new Predmeti();
+
+                            foreach (Predmeti p in iL.Predmeti)
+                            {
+                                tmpPredmet = p;
+
+                                foreach (Smerovi s in p.SmeroviPredmeta)
+                                {
+                                    if (s.NazivSmera.Equals(prethodnoSelektovanSmer.NazivSmera))
+                                        novaListaSmerovaPredmeta.Add(noviSmer);
+                                    else
+                                        novaListaSmerovaPredmeta.Add(s);
+                                }
+
+                                tmpPredmet.SmeroviPredmeta = novaListaSmerovaPredmeta;
+                                novaListaPredmeta.Add(tmpPredmet);
+                            }
+
+                            kolekcijaIzbornihListi.FindOneAndUpdate(Builders<IzbornaLista>.Filter.Eq("brojIndeksa", iL.BrojIndeksa),
+                                Builders<IzbornaLista>.Update.Set("predmeti", novaListaPredmeta));
+                            
+                            novaListaSmerovaPredmeta = new List<Smerovi>();
+                            novaListaPredmeta = new List<Predmeti>();
+
+                            foreach (Predmeti p in iL.PredmetiDrugihSmerova)
+                            {
+                                tmpPredmet = p;
+
+                                foreach (Smerovi s in p.SmeroviPredmeta)
+                                {
+                                    if (s.NazivSmera.Equals(prethodnoSelektovanSmer.NazivSmera))
+                                        novaListaSmerovaPredmeta.Add(noviSmer);
+                                    else
+                                        novaListaSmerovaPredmeta.Add(s);
+                                }
+
+                                tmpPredmet.SmeroviPredmeta = novaListaSmerovaPredmeta;
+                                novaListaPredmeta.Add(tmpPredmet);
+                            }
+
+                            kolekcijaIzbornihListi.FindOneAndUpdate(Builders<IzbornaLista>.Filter.Eq("brojIndeksa", iL.BrojIndeksa),
+                                Builders<IzbornaLista>.Update.Set("predmetiDrugihSmerova", novaListaPredmeta));
+                        }
+
+                        MessageBox.Show("Izborne liste uspesno azurirane sa novim smerom!");
 
                         idSmeraTb.Enabled = false;
                         nazivSmeraTb.Enabled = false;
@@ -854,10 +912,7 @@ namespace tvp_projekat1
                         ((Button)(mainPanel.Controls.Find("prikazStatistikeBtn", true))[0]).Enabled = false;
                         ((Button)(mainPanel.Controls.Find("prikazStatistikeBtn", true))[0]).Enabled = false;
                         ((Button)(mainPanel.Controls.Find("sacuvajIzmeneBtn", true))[0]).Enabled = false;
-
-                        GenerisiSmerove();
-                        GenerisiPredmete();
-                        GenerisiStudente();
+                        
                     }
                     else
                         MessageBox.Show("Vec postoji smer sa sifrom " + noviIdSmera);
