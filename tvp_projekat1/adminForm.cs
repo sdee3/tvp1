@@ -197,7 +197,7 @@ namespace tvp_projekat1
                         login.Username = (noviStudent.BrojIndeksa.Length > 0) ? noviStudent.BrojIndeksa : noviStudent.ImePrezime.Split(' ')[0];
                         login.Password = noviStudent.ImePrezime.Split(' ')[0];
 
-                        if (!DuplikatStudenta(noviStudent.JMBG, noviStudent.BrojTelefona))
+                        if (!DuplikatStudenta(noviStudent.JMBG, noviStudent.BrojTelefona, noviStudent.BrojIndeksa))
                         {
 
                             kolekcijaStudenata.InsertOne(noviStudent);
@@ -237,7 +237,7 @@ namespace tvp_projekat1
                             login.Username = (noviStudent.BrojIndeksa.Length > 0) ? noviStudent.BrojIndeksa : noviStudent.ImePrezime.Split(' ')[0];
                             login.Password = noviStudent.ImePrezime.Split(' ')[0];
 
-                            if (!DuplikatStudenta(noviStudent.JMBG, noviStudent.BrojTelefona))
+                            if (!DuplikatStudenta(noviStudent.JMBG, noviStudent.BrojTelefona, noviStudent.BrojIndeksa))
                             {
 
                                 kolekcijaStudenata.InsertOne(noviStudent);
@@ -378,10 +378,10 @@ namespace tvp_projekat1
             azuriranjeStudentaBtn.Enabled = false;
 
             flagZaSaveDugme = "student";
-            sacuvajIzmeneBtn.Click += (sender, ea) => SnimanjeStudenta(prethodnoSelektovanStudent);
+            sacuvajIzmeneBtn.Click += (sender, ea) => SnimanjeAzuriranogStudenta(prethodnoSelektovanStudent);
         }
 
-        private void SnimanjeStudenta(Studenti prethodnoSelektovanStudent)
+        private void SnimanjeAzuriranogStudenta(Studenti prethodnoSelektovanStudent)
         {
             if (flagZaSaveDugme.Equals("student"))
             {
@@ -417,20 +417,19 @@ namespace tvp_projekat1
                     {
                         noviStudent.Smer = new Smerovi();
                         noviStudent.ImePrezime = imePrezimeTb.Text;
-                        noviStudent.BrojIndeksa = (brojIndeksaTb.Text.Length > 0) ? brojIndeksaTb.Text : ("temp" + jmbgTb.Text);
+                        noviStudent.BrojIndeksa = (brojIndeksaTb.Text.Length > 0) 
+                            ? ValidirajPodatakPostojecegStudenta(brojIndeksaTb.Text, prethodnoSelektovanStudent) : ("temp" + jmbgTb.Text);
                         noviStudent.DatumRodjenja = datumRodjenjaTb.Text;
-                        noviStudent.JMBG = jmbgTb.Text;
-                        noviStudent.BrojTelefona = brojTelefonaTb.Text;
+                        noviStudent.JMBG = ValidirajPodatakPostojecegStudenta(jmbgTb.Text, prethodnoSelektovanStudent);
+                        noviStudent.BrojTelefona = ValidirajPodatakPostojecegStudenta(brojTelefonaTb.Text, prethodnoSelektovanStudent);
 
                         novaIzbornaLista.BrojIndeksa = noviStudent.BrojIndeksa;
                         noviLogin.Password = noviStudent.ImePrezime.Split(' ')[0];
                         noviLogin.Username = noviStudent.BrojIndeksa;
 
                         if (noviStudent.JMBG.Equals(prethodnoSelektovanStudent.JMBG)
-                            && noviStudent.BrojTelefona.Equals(prethodnoSelektovanStudent.BrojTelefona)
-                            )
+                            && noviStudent.BrojTelefona.Equals(prethodnoSelektovanStudent.BrojTelefona))
                         {
-
                             kolekcijaStudenata.FindOneAndReplace(Builders<Studenti>.Filter.Eq("jmbg", prethodnoSelektovanStudent.JMBG), noviStudent);
                             kolekcijaIzbornihListi.FindOneAndReplace(Builders<IzbornaLista>.Filter.Eq("brojIndeksa", prethodnoSelektovanStudent.BrojIndeksa), novaIzbornaLista);
                             kolekcijaLogin.FindOneAndReplace(Builders<Login>.Filter.Eq("username", prethodnoSelektovanStudent.BrojIndeksa), noviLogin);
@@ -453,17 +452,17 @@ namespace tvp_projekat1
                         {
                             noviStudent.Smer = pronadjeniSmer[0];
                             noviStudent.ImePrezime = imePrezimeTb.Text;
-                            noviStudent.BrojIndeksa = (brojIndeksaTb.Text.Length > 0) ? brojIndeksaTb.Text : "";
+                            noviStudent.BrojIndeksa = (brojIndeksaTb.Text.Length > 0) 
+                                ? ValidirajPodatakPostojecegStudenta(brojIndeksaTb.Text, prethodnoSelektovanStudent) : "";
                             noviStudent.DatumRodjenja = datumRodjenjaTb.Text;
-                            noviStudent.JMBG = jmbgTb.Text;
-                            noviStudent.BrojTelefona = brojTelefonaTb.Text;
+                            noviStudent.JMBG = ValidirajPodatakPostojecegStudenta(jmbgTb.Text, prethodnoSelektovanStudent);
+                            noviStudent.BrojTelefona = ValidirajPodatakPostojecegStudenta(brojTelefonaTb.Text, prethodnoSelektovanStudent);
 
                             novaIzbornaLista.BrojIndeksa = noviStudent.BrojIndeksa;
                             noviLogin.Password = noviStudent.ImePrezime.Split(' ')[0];
                             noviLogin.Username = noviStudent.BrojIndeksa;
 
-                            if (noviStudent.JMBG.Equals(prethodnoSelektovanStudent.JMBG)
-                            )
+                            if (noviStudent.JMBG.Equals(prethodnoSelektovanStudent.JMBG))
                             {
                                 kolekcijaStudenata.FindOneAndReplace(Builders<Studenti>.Filter.Eq("jmbg", prethodnoSelektovanStudent.JMBG), noviStudent);
                                 kolekcijaIzbornihListi.FindOneAndReplace(Builders<IzbornaLista>.Filter.Eq("brojIndeksa", prethodnoSelektovanStudent.BrojIndeksa), novaIzbornaLista);
@@ -493,6 +492,30 @@ namespace tvp_projekat1
                     MessageBox.Show("Greska u unosu! Polja za ime i prezime, datum rodjenja, broj telefona, i JMBG su obavezna!");
                 }
             }
+        }
+
+        private string ValidirajPodatakPostojecegStudenta(string podatak, Studenti prethodnoSelektovanStudent)
+        {
+            string rezultat = "";
+
+            foreach(Studenti s in sviStudenti)
+            {
+                if (prethodnoSelektovanStudent.JMBG.Equals(s.JMBG))
+                    continue;
+                else
+                {
+                    if (podatak.Equals(s.BrojIndeksa) || podatak.Equals(s.JMBG) || podatak.Equals(s.BrojTelefona))
+                    {
+                        rezultat = "temp123";
+                        MessageBox.Show("Student vec postoji u bazi! Nova vrednost podatka je 'temp123' - molimo da sto pre azurirate ovaj podatak!");
+                        break;
+                    }
+                    else
+                        rezultat = podatak;
+                }
+            }
+
+            return rezultat;
         }
 
         private void ComboBoxPredmetChanged(object s, EventArgs e, IMongoCollection<Predmeti> kolekcijaPredmeta, GenerisiKontrole generisiKontrole)
@@ -939,12 +962,12 @@ namespace tvp_projekat1
             return result;
         }
 
-        private bool DuplikatStudenta(string jmbgZaProveru, string brojTelefonaZaProveru)
+        private bool DuplikatStudenta(string jmbgZaProveru, string brojTelefonaZaProveru, string brojIndeksaZaProveru)
         {
             bool result = false;
             foreach (Studenti s in sviStudenti)
             {
-                if (s.JMBG.Equals(jmbgZaProveru) || s.BrojTelefona.Equals(brojTelefonaZaProveru))
+                if (s.JMBG.Equals(jmbgZaProveru) || s.BrojTelefona.Equals(brojTelefonaZaProveru) ||s.BrojIndeksa.Equals(brojIndeksaZaProveru))
                 {
                     result = true;
                     break;
