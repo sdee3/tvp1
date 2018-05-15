@@ -1041,11 +1041,6 @@ namespace tvp_projekat1
             brisanjeSmeraBtn.Location = new Point(150, (pocetnaYOsa + razmakYOsa));
             brisanjeSmeraBtn.Name = "brisanjeSmeraBtn";
 
-            prikazStatistikeBtn.Text = "Prikaz statistike smera";
-            prikazStatistikeBtn.Size = new Size(100, 50);
-            prikazStatistikeBtn.Location = new Point(275, (pocetnaYOsa + razmakYOsa));
-            prikazStatistikeBtn.Name = "prikazStatistikeBtn";
-
             sacuvajIzmeneBtn.Text = "Sačuvaj izmene";
             sacuvajIzmeneBtn.Size = new Size(100, 50);
             sacuvajIzmeneBtn.Location = new Point(25, (pocetnaYOsa + razmakYOsa + 75));
