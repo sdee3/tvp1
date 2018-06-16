@@ -932,7 +932,6 @@ namespace tvp_projekat1
 
                         ((Button)(mainPanel.Controls.Find("brisanjeSmeraBtn", true))[0]).Enabled = false;
                         ((Button)(mainPanel.Controls.Find("prikazStatistikeBtn", true))[0]).Enabled = false;
-                        ((Button)(mainPanel.Controls.Find("prikazStatistikeBtn", true))[0]).Enabled = false;
                         ((Button)(mainPanel.Controls.Find("sacuvajIzmeneBtn", true))[0]).Enabled = false;
                         
                     }
