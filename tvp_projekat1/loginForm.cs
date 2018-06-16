@@ -20,16 +20,16 @@ namespace tvp_projekat1
 
         private void loginForm_Load(object sender, EventArgs e)
         {
-            var collection = new MongoClient("mongodb://sdee3:sdee3@ds147964.mlab.com:47964/tvp")
+            IMongoCollection<BsonDocument> collection = new MongoClient("mongodb://sdee3:sdee3@ds147964.mlab.com:47964/tvp")
                 .GetDatabase("tvp")
-                .GetCollection<BsonDocument>("login");
-
+.GetCollection<BsonDocument>("login");
+                
             loginButton.Click += (s, EventArgs) => { ProveriPodatke(s, EventArgs, collection.Find(new BsonDocument()).ToCursor()); };
         }
 
         private void ProveriPodatke(object sender, EventArgs e, IAsyncCursor<BsonDocument> asyncCursor)
         {
-            foreach (var document in asyncCursor.ToEnumerable())
+            foreach (BsonDocument document in asyncCursor.ToEnumerable())
             {
                 if (document["username"].Equals(usernameInput.Text) && document["password"].Equals(passwordInput.Text))
                     if (document["accountStatus"].Equals("admin"))
