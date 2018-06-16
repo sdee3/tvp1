@@ -441,6 +441,7 @@ namespace tvp_projekat1
                             buttonAddStudent.Enabled = true;
 
                             GenerisiStudente();
+                            GenerisiPredmete();
                         }
                         else
                             MessageBox.Show("Student vec postoji u bazi!");
@@ -475,6 +476,7 @@ namespace tvp_projekat1
                                 buttonAddStudent.Enabled = true;
 
                                 GenerisiStudente();
+                                GenerisiPredmete();
                             }
                             else
                                 MessageBox.Show("Student vec postoji u bazi! Takodje, nije dozvoljeno menjati JMBG studenta.");
