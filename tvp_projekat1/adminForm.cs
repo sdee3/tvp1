@@ -62,10 +62,9 @@ namespace tvp_projekat1
 
             Button azuriranjeSmeraBtn = (Button)(mainPanel.Controls.Find("azuriranjeSmeraBtn", true))[0];
             Button brisanjeSmeraBtn = (Button)(mainPanel.Controls.Find("brisanjeSmeraBtn", true))[0];
-            Button prikazStatistikeBtn = (Button)(mainPanel.Controls.Find("prikazStatistikeBtn", true))[0];
             Button sacuvajIzmeneBtn = (Button)(mainPanel.Controls.Find("sacuvajIzmeneBtn", true))[0];
 
-            azuriranjeSmeraBtn.Enabled = brisanjeSmeraBtn.Enabled = prikazStatistikeBtn.Enabled = sacuvajIzmeneBtn.Enabled = false;
+            azuriranjeSmeraBtn.Enabled = brisanjeSmeraBtn.Enabled = sacuvajIzmeneBtn.Enabled = false;
 
             buttonSaveIzmene.Enabled = true;
             buttonAddSmer.Enabled = false;
@@ -931,7 +930,6 @@ namespace tvp_projekat1
                         nazivSmeraTb.Enabled = false;
 
                         ((Button)(mainPanel.Controls.Find("brisanjeSmeraBtn", true))[0]).Enabled = false;
-                        ((Button)(mainPanel.Controls.Find("prikazStatistikeBtn", true))[0]).Enabled = false;
                         ((Button)(mainPanel.Controls.Find("sacuvajIzmeneBtn", true))[0]).Enabled = false;
                         
                     }
@@ -998,7 +996,6 @@ namespace tvp_projekat1
             List<TextBox> textBoxList = new List<TextBox>();
             Button azuriranjeSmeraBtn = new Button();
             Button brisanjeSmeraBtn = new Button();
-            Button prikazStatistikeBtn = new Button();
             Button sacuvajIzmeneBtn = new Button();
 
             Label idSmera = new Label(), nazivSmera = new Label();
@@ -1046,7 +1043,6 @@ namespace tvp_projekat1
 
             mainPanel.Controls.Add(azuriranjeSmeraBtn);
             mainPanel.Controls.Add(brisanjeSmeraBtn);
-            mainPanel.Controls.Add(prikazStatistikeBtn);
             mainPanel.Controls.Add(sacuvajIzmeneBtn);
 
             razmakYOsa = 0;
