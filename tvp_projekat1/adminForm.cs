@@ -277,7 +277,7 @@ namespace tvp_projekat1
             
             GenerisiKontrole generisiKontrole = new GenerisiKontrole(GenerisiKontroleZaSmerove);
 
-            foreach (var smer in sviSmerovi)
+            foreach (Smerovi smer in sviSmerovi)
             {
                 comboBoxSmerovi.Items.Add(smer.NazivSmera);
             }
@@ -291,7 +291,7 @@ namespace tvp_projekat1
             sviPredmeti = kolekcijaPredmeta.Find(new BsonDocument()).ToList();
             GenerisiKontrole generisiKontrole = new GenerisiKontrole(GenerisiKontroleZaPredmete);
 
-            foreach (var predmet in sviPredmeti)
+            foreach (Predmeti predmet in sviPredmeti)
             {
                 comboBoxPredmeti.Items.Add(predmet.NazivPredmeta);
             }
@@ -304,7 +304,7 @@ namespace tvp_projekat1
             sviStudenti = kolekcijaStudenata.Find(new BsonDocument()).ToList();
             GenerisiKontrole generisiKontrole = new GenerisiKontrole(GenerisiKontroleZaStudente);
 
-            foreach (var student in sviStudenti)
+            foreach (Studenti student in sviStudenti)
             {
                 comboBoxStudenti.Items.Add(student.BrojIndeksa);
             }
@@ -352,7 +352,7 @@ namespace tvp_projekat1
 
         private void BrisanjeStudenta(Studenti prethodnoSelektovanStudent)
         {
-            var confirmResult = MessageBox.Show("Da li sigurno zelite izbrisati studenta iz baze?", "Potvrda brisanja",  MessageBoxButtons.YesNo);
+            DialogResult confirmResult = MessageBox.Show("Da li sigurno zelite izbrisati studenta iz baze?", "Potvrda brisanja",  MessageBoxButtons.YesNo);
             if (confirmResult == DialogResult.Yes)
             {
                 kolekcijaStudenata.FindOneAndDelete(Builders<Studenti>.Filter.Eq("jmbg", prethodnoSelektovanStudent.JMBG));
@@ -548,7 +548,7 @@ namespace tvp_projekat1
             obavezanTb.Text = predmet.Obavezan ? "Obavezan" : "Neobavezan";
             espbTb.Text = predmet.ESPB.ToString();
 
-            foreach(var smer in predmet.SmeroviPredmeta)
+            foreach(Smerovi smer in predmet.SmeroviPredmeta)
             {
                 smeroviTb.Text += smer.NazivSmera + ", ";
             }
@@ -580,7 +580,7 @@ namespace tvp_projekat1
                         nemaStudenata = false;
             }
 
-            var confirmResult = MessageBox.Show("Da li sigurno zelite izbrisati predmet iz baze?", "Potvrda brisanja", MessageBoxButtons.YesNo);
+            DialogResult confirmResult = MessageBox.Show("Da li sigurno zelite izbrisati predmet iz baze?", "Potvrda brisanja", MessageBoxButtons.YesNo);
             if (confirmResult == DialogResult.Yes && nemaStudenata)
             {
                 kolekcijaPredmeta.FindOneAndDelete(Builders<Predmeti>.Filter.Eq("sifraPredmeta", prethodnoSelektovanPredmet.SifraPredmeta));
@@ -799,7 +799,7 @@ namespace tvp_projekat1
                 }
             }
 
-            var confirmResult = MessageBox.Show("Da li sigurno zelite izbrisati smer iz baze?", "Potvrda brisanja", MessageBoxButtons.YesNo);
+            DialogResult confirmResult = MessageBox.Show("Da li sigurno zelite izbrisati smer iz baze?", "Potvrda brisanja", MessageBoxButtons.YesNo);
             if (confirmResult == DialogResult.Yes && nemaPredmeta && nemaStudenata)
             {
                 kolekcijaSmerova.FindOneAndDelete(Builders<Smerovi>.Filter.Eq("sifraSmera", smer.SifraSmera));
