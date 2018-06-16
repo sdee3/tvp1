@@ -150,7 +150,7 @@ namespace tvp_projekat1
                     brojacESPB -= selektovanPredmet.ESPB;
                     labelSumaESPB.Text = brojacESPB.ToString();
                     ProveraESPBBodova();
-                }
+                } 
             }
         }
 
