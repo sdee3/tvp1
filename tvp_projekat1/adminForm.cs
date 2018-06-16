@@ -753,7 +753,6 @@ namespace tvp_projekat1
 
             Button azuriranjeSmeraBtn = (Button)(mainPanel.Controls.Find("azuriranjeSmeraBtn", true))[0];
             Button brisanjeSmeraBtn = (Button)(mainPanel.Controls.Find("brisanjeSmeraBtn", true))[0];
-            Button prikazStatistikeBtn = (Button)(mainPanel.Controls.Find("prikazStatistikeBtn", true))[0];
             Button sacuvajIzmeneBtn = (Button)(mainPanel.Controls.Find("sacuvajIzmeneBtn", true))[0];
 
             sacuvajIzmeneBtn.Enabled = false;
